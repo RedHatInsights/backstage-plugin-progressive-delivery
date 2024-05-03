@@ -1,0 +1,38 @@
+{
+  "extends": "@backstage/cli/config/tsconfig.json",
+  "include": ["src", "dev"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    //"outDir": "../../dist-types/plugins/progressive-delivery",
+    "outDir": "./dist-types",
+    "rootDir": ".",
+    // "noImplicitAny": true,
+    // "module": "es6",
+    // "target": "es5",
+    // "jsx": "react",
+
+    "target": "es5",
+    "lib": ["es2015", "dom"],
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node"
+  }
+}
+
+// {
+//   "compilerOptions": {
+//     "target": "es5",
+//     "lib": ["es2015", "dom"],
+//     "jsx": "react",
+//     "allowSyntheticDefaultImports": true,
+//     "paths": {
+//       "@patternfly/react-core": ["./node_modules/@patternfly/react-core/dist/types"]
+//     }
+//   },
+//   "exclude": [
+//     "node_modules"
+//   ],
+//   "include": [
+//     "custom.d.ts"
+//   ]
+// }

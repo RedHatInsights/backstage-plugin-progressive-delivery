@@ -1,0 +1,91 @@
+{
+  "name": "@backstage-plugin-progressive-delivery/backstage-plugin-progressive-delivery-backend",
+  "version": "0.1.0",
+  "main": "dist/index.cjs.js",
+  "types": "src/index.d.ts",
+  "license": "Apache-2.0",
+  "private": true,
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.cjs.js",
+    "types": "dist/index.d.ts"
+  },
+  "backstage": {
+    "role": "backend-plugin"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./alpha": "./src/alpha.ts",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "alpha": [
+        "src/alpha.ts"
+      ],
+      "package.json": [
+        "package.json"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "backstage-cli package build",
+    "clean": "backstage-cli package clean",
+    "export-dynamic": "janus-cli package export-dynamic-plugin",
+    "lint": "backstage-cli package lint",
+    "postpack": "backstage-cli package postpack",
+    "postversion": "yarn run export-dynamic",
+    "prepack": "backstage-cli package prepack",
+    "start": "backstage-cli package start",
+    "test": "backstage-cli package test --passWithNoTests --coverage",
+    "tsc": "tsc",
+    "rebuild": "yarn tsc && yarn export-dynamic",
+    "repack": "yarn tsc && yarn build && yarn pack"
+  },
+  "dependencies": {
+    "@backstage/backend-common": "^0.21.0",
+    "@backstage/backend-plugin-api": "^0.6.10",
+    "@backstage/backend-plugin-manager": "npm:@janus-idp/backend-plugin-manager@0.0.2-janus.5",
+    "@backstage/config": "^1.1.1",
+    "@backstage/core-plugin-api": "^1.9.1",
+    "@types/express": "^*",
+    "express": "^4.17.1",
+    "express-promise-router": "^4.1.0",
+    "node-fetch": "^2.6.7",
+    "winston": "^3.2.1",
+    "yn": "^4.0.0"
+  },
+  "devDependencies": {
+    "@backstage/cli": "0.25.2",
+    "@janus-idp/cli": "1.7.2",
+    "@types/supertest": "2.0.12",
+    "msw": "1.0.0",
+    "supertest": "6.2.4"
+  },
+  "files": [
+    "dist",
+    "config.d.ts",
+    "dist-dynamic/*.*",
+    "dist-dynamic/dist/**",
+    "dist-dynamic/alpha/*",
+    "app-config.janus-idp.yaml"
+  ],
+  "configSchema": "config.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/janus-idp/backstage-plugins",
+    "directory": "plugins/progressive-delivery"
+  },
+  "keywords": [
+    "backstage",
+    "plugin"
+  ],
+  "homepage": "https://janus-idp.io/",
+  "bugs": "https://github.com/janus-idp/backstage-plugins/issues",
+  "scalprum": {
+    "name": "plugin-progressive-delivery-backend",
+    "exposedModules": {
+      "PluginRoot": "./src/index.ts"
+    }
+  }
+}

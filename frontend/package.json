@@ -1,0 +1,85 @@
+{
+  "name": "@backstage-plugin-progressive-delivery/backstage-plugin-progressive-delivery-frontend",
+  "version": "0.1.0",
+  "main": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "private": true,
+  "publishConfig": {
+    "access": "public",
+    "main": "dist/index.esm.js",
+    "types": "dist/index.d.ts"
+  },
+  "backstage": {
+    "role": "frontend-plugin"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "backstage-cli package build",
+    "clean": "backstage-cli package clean",
+    "export-dynamic": "janus-cli package export-dynamic-plugin",
+    "lint": "backstage-cli package lint",
+    "postpack": "backstage-cli package postpack",
+    "postversion": "yarn run export-dynamic",
+    "prepack": "backstage-cli package prepack",
+    "start": "backstage-cli package start",
+    "test": "backstage-cli package test --passWithNoTests --coverage",
+    "tsc": "tsc",
+    "rebuild": "yarn tsc && yarn export-dynamic",
+    "repack": "yarn tsc && yarn build && yarn pack"
+  },
+  "dependencies": {
+    "@backstage/core-components": "^0.14.0",
+    "@backstage/core-plugin-api": "^1.9.0",
+    "@backstage/theme": "^0.5.2",
+    "@material-ui/core": "^4.12.2",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1",
+    "react-use": "^17.2.4",
+    "react-zoom-pan-pinch": "^3.4.3"
+  },
+  "peerDependencies": {
+    "react": "16.13.1 || ^17.0.0 || ^18.0.0"
+  },
+  "devDependencies": {
+    "@backstage/cli": "^0.25.2",
+    "@backstage/core-app-api": "^1.12.0",
+    "@backstage/dev-utils": "^1.0.27",
+    "@backstage/test-utils": "^1.5.0",
+    "@janus-idp/cli": "^1.7.2",
+    "@testing-library/jest-dom": "6.0.0",
+    "@testing-library/react": "14.0.0",
+    "@testing-library/user-event": "14.0.0",
+    "@types/react-dom": "^18.2.19",
+    "@types/react-svg-pan-zoom": "^3.3.9",
+    "msw": "1.0.0"
+  },
+  "files": [
+    "dist",
+    "config.d.ts",
+    "dist-scalprum",
+    "app-config.janus-idp.yaml"
+  ],
+  "configSchema": "config.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://gitlabe.cee.redhat.com/reavessm/backstage-plugins",
+    "directory": "plugins/progressive-delivery"
+  },
+  "keywords": [
+    "backstage",
+    "plugin"
+  ],
+  "homepage": "https://janus-idp.io/",
+  "bugs": "https://github.com/janus-idp/backstage-plugins/issues",
+  "scalprum": {
+    "name": "plugin-progressive-delivery",
+    "exposedModules": {
+      "PluginRoot": "./src/index.ts"
+    }
+  },
+  "module": "./dist/index.esm.js"
+}
