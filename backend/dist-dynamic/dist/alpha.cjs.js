@@ -20,6 +20,8 @@ const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
       async init({ config, logger, http }) {
         logger.info("Initing progressive-delivery plugin");
         http.use(() => router.createRouter({ ...config, logger: backendCommon.loggerToWinstonLogger(logger) }));
+        http.addAuthPolicy({ path: "/health", allow: "unauthenticated" });
+        http.addAuthPolicy({ path: "/topo", allow: "unauthenticated" });
       }
     });
   }
