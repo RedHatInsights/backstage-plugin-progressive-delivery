@@ -13,7 +13,7 @@ async function createRouter(options) {
   const { logger } = options;
   const router = Router__default["default"]();
   router.use(express__default["default"].json());
-  router.get("/health", (_, response) => {
+  router.get("/healthcheck", (_, response) => {
     logger.info("PONG!");
     response.json({ status: "ok" });
   });
@@ -31,4 +31,4 @@ async function createRouter(options) {
 }
 
 exports.createRouter = createRouter;
-//# sourceMappingURL=router-7e904332.cjs.js.map
+//# sourceMappingURL=router-15fbb0dc.cjs.js.map
