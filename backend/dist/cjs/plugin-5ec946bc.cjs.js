@@ -43,7 +43,6 @@ const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
       async init({ config, logger, http }) {
         logger.info("Initing progressive-delivery plugin");
         http.use(() => createRouter({ ...config, logger: backendCommon.loggerToWinstonLogger(logger) }));
-        http.addAuthPolicy({ path: "/health", allow: "unauthenticated" });
       }
     });
   }
@@ -51,4 +50,4 @@ const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
 
 exports.createRouter = createRouter;
 exports.progressive_deliveryPlugin = progressive_deliveryPlugin;
-//# sourceMappingURL=plugin-0ad714c0.cjs.js.map
+//# sourceMappingURL=plugin-5ec946bc.cjs.js.map
