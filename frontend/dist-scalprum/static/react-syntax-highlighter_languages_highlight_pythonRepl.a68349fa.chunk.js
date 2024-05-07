@@ -1,0 +1,2 @@
+(self.webpackChunkplugin_progressive_delivery=self.webpackChunkplugin_progressive_delivery||[]).push([[1895],{90736:e=>{e.exports=function(e){return{aliases:["pycon"],contains:[{className:"meta",starts:{end:/ |$/,starts:{end:"$",subLanguage:"python"}},variants:[{begin:/^>>>(?=[ ]|$)/},{begin:/^\.\.\.(?=[ ]|$)/}]}]}}}}]);
+//# sourceMappingURL=react-syntax-highlighter_languages_highlight_pythonRepl.a68349fa.chunk.js.map
