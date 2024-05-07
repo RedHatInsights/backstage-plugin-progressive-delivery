@@ -5,7 +5,7 @@
   "registrationMethod": "callback",
   "baseURL": "auto",
   "loadScripts": [
-    "plugin-progressive-delivery.b8db128bff338b13f05b.js"
+    "plugin-progressive-delivery.e8f43c87c7223b4ab740.js"
   ],
-  "buildHash": "b8db128bff338b13f05b4ea726391beb"
+  "buildHash": "e8f43c87c7223b4ab740bad34f80111b"
 }
