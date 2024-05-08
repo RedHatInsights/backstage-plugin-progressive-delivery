@@ -32,5 +32,3 @@ export async function createRouter(
   router.use(errorHandler());
   return router;
 }
-
-
