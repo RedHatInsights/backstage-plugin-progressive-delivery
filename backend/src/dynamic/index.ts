@@ -4,7 +4,7 @@ import { createRouter } from '../service/router';
 export const dynamicPluginInstaller: BackendDynamicPluginInstaller = {
   kind: 'legacy',
   router: {
-    pluginID: 'progressive-delivery',
+    pluginID: 'plugin-progressive-delivery-backend',
     createPlugin: createRouter,
   },
 };

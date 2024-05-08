@@ -1,4 +1,4 @@
-import { loggerToWinstonLogger } from '@backstage/backend-common';
+//import { loggerToWinstonLogger } from '@backstage/backend-common';
 import { coreServices, createBackendPlugin } from '@backstage/backend-plugin-api';
 
 import { createRouter } from './service/router';
@@ -6,22 +6,33 @@ import { createRouter } from './service/router';
 /**
  * The progressive-delivery backend plugin.
  *
- * @alpha
+ * @public
  */
 export const progressive_deliveryPlugin = createBackendPlugin({
-  pluginId: 'plugin-progressive-delivery',
+  pluginId: 'plugin-progressive-delivery-backend',
   register(env) {
     env.registerInit({
       deps: {
+        httpRouter: coreServices.httpRouter,
         logger: coreServices.logger,
-        config: coreServices.rootConfig,
-        http: coreServices.httpRouter,
       },
-      async init({ config, logger, http }) {
-        logger.info("Initing progressive-delivery plugin");
-        http.use(() => createRouter({...config, logger: loggerToWinstonLogger(logger)}));
-        http.addAuthPolicy({ path: '/health', allow: 'unauthenticated'});
-        http.addAuthPolicy({ path: '/topo', allow: 'unauthenticated'});
+      async init({
+        httpRouter,
+        logger,
+      }) {
+        httpRouter.use(
+          await createRouter({
+            logger,
+          }),
+        );
+        httpRouter.addAuthPolicy({
+          path: '/health',
+          allow: 'unauthenticated',
+        });
+        httpRouter.addAuthPolicy({
+          path: '/topo',
+          allow: 'unauthenticated',
+        });
       },
     });
   },

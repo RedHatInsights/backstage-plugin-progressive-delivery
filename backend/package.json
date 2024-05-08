@@ -40,7 +40,7 @@
     "test": "backstage-cli package test --passWithNoTests --coverage",
     "tsc": "tsc",
     "rebuild": "yarn tsc && yarn export-dynamic",
-    "repack": "yarn tsc && yarn build && yarn pack"
+    "repack": "yarn tsc && yarn export-dynamic && yarn pack"
   },
   "dependencies": {
     "@backstage/backend-common": "^0.21.0",

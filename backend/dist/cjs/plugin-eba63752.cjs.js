@@ -1,5 +1,6 @@
 'use strict';
 
+var backendPluginApi = require('@backstage/backend-plugin-api');
 var backendCommon = require('@backstage/backend-common');
 var express = require('express');
 var Router = require('express-promise-router');
@@ -13,7 +14,8 @@ async function createRouter(options) {
   const { logger } = options;
   const router = Router__default["default"]();
   router.use(express__default["default"].json());
-  router.get("/healthcheck", (_, response) => {
+  router.get("/health", (_, response) => {
+    console.log("Health");
     logger.info("PONG!");
     response.json({ status: "ok" });
   });
@@ -30,5 +32,36 @@ async function createRouter(options) {
   return router;
 }
 
+const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
+  pluginId: "plugin-progressive-delivery-backend",
+  register(env) {
+    env.registerInit({
+      deps: {
+        httpRouter: backendPluginApi.coreServices.httpRouter,
+        logger: backendPluginApi.coreServices.logger
+      },
+      async init({
+        httpRouter,
+        logger
+      }) {
+        httpRouter.use(
+          await createRouter({
+            logger
+          })
+        );
+        httpRouter.addAuthPolicy({
+          path: "/health",
+          allow: "unauthenticated"
+        });
+        httpRouter.addAuthPolicy({
+          path: "/topo",
+          allow: "unauthenticated"
+        });
+      }
+    });
+  }
+});
+
 exports.createRouter = createRouter;
-//# sourceMappingURL=router-15fbb0dc.cjs.js.map
+exports.progressive_deliveryPlugin = progressive_deliveryPlugin;
+//# sourceMappingURL=plugin-eba63752.cjs.js.map

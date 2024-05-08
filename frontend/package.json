@@ -26,7 +26,7 @@
     "test": "backstage-cli package test --passWithNoTests --coverage",
     "tsc": "tsc",
     "rebuild": "yarn tsc && yarn export-dynamic",
-    "repack": "yarn tsc && yarn build && yarn pack"
+    "repack": "yarn tsc && yarn build && yarn export-dynamic && yarn pack"
   },
   "dependencies": {
     "@backstage/core-components": "^0.14.0",

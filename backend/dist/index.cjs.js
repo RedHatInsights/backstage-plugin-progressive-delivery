@@ -2,16 +2,16 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var plugin = require('./cjs/plugin-f0607bfa.cjs.js');
-require('@backstage/backend-common');
+var plugin = require('./cjs/plugin-eba63752.cjs.js');
 require('@backstage/backend-plugin-api');
+require('@backstage/backend-common');
 require('express');
 require('express-promise-router');
 
 const dynamicPluginInstaller = {
   kind: "legacy",
   router: {
-    pluginID: "progressive-delivery",
+    pluginID: "plugin-progressive-delivery-backend",
     createPlugin: plugin.createRouter
   }
 };

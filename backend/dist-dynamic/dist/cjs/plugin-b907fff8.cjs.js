@@ -1,6 +1,7 @@
 'use strict';
 
 var backendCommon = require('@backstage/backend-common');
+var backendPluginApi = require('@backstage/backend-plugin-api');
 var express = require('express');
 var Router = require('express-promise-router');
 
@@ -14,11 +15,11 @@ async function createRouter(options) {
   const router = Router__default["default"]();
   router.use(express__default["default"].json());
   router.get("/health", (_, response) => {
+    console.log("Health");
     logger.info("PONG!");
     response.json({ status: "ok" });
   });
-  router.get("/topo", (request, response) => {
-    console.log(request);
+  router.get("/topo", (_, response) => {
     backendCommon.loadBackendConfig({ logger, argv: [] }).then((config) => {
       response.sendFile(config.getString("progressive-delivery.saas-promotions-json"));
     }).catch((error) => {
@@ -31,5 +32,25 @@ async function createRouter(options) {
   return router;
 }
 
+const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
+  pluginId: "plugin-progressive-delivery-backend",
+  register(env) {
+    env.registerInit({
+      deps: {
+        logger: backendPluginApi.coreServices.logger,
+        config: backendPluginApi.coreServices.rootConfig,
+        http: backendPluginApi.coreServices.httpRouter
+      },
+      async init({ config, logger, http }) {
+        logger.info("Initing progressive-delivery plugin");
+        http.use(() => createRouter({ ...config, logger: backendCommon.loggerToWinstonLogger(logger) }));
+        http.addAuthPolicy({ path: "/health", allow: "unauthenticated" });
+        http.addAuthPolicy({ path: "/topo", allow: "unauthenticated" });
+      }
+    });
+  }
+});
+
 exports.createRouter = createRouter;
-//# sourceMappingURL=router-3da95959.cjs.js.map
+exports.progressive_deliveryPlugin = progressive_deliveryPlugin;
+//# sourceMappingURL=plugin-b907fff8.cjs.js.map

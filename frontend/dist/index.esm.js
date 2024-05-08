@@ -13,7 +13,7 @@ const progressiveDeliveryPlugin = createPlugin({
 const ProgressiveDeliveryPage = progressiveDeliveryPlugin.provide(
   createRoutableExtension({
     name: "ProgressiveDeliveryPage",
-    component: () => import('./esm/index-4e53575e.esm.js').then((m) => m.TopologyComponent),
+    component: () => import('./esm/index-cd95c737.esm.js').then((m) => m.TopologyComponent),
     mountPoint: rootRouteRef
   })
 );

@@ -1,6 +1,6 @@
 import express from 'express';
-import { Logger } from 'winston';
+import { LoggerService } from '@backstage/backend-plugin-api';
 export interface RouterOptions {
-    logger: Logger;
+    logger: LoggerService;
 }
 export declare function createRouter(options: RouterOptions): Promise<express.Router>;

@@ -1,10 +1,11 @@
 import { errorHandler, loadBackendConfig } from '@backstage/backend-common';
 import express from 'express';
 import Router from 'express-promise-router';
-import { Logger } from 'winston';
+//import { Logger } from 'winston';
+import { LoggerService } from '@backstage/backend-plugin-api';
 
 export interface RouterOptions {
-  logger: Logger;
+  logger: LoggerService;
 }
 
 export async function createRouter(
@@ -16,6 +17,7 @@ export async function createRouter(
   router.use(express.json());
 
   router.get('/health', (_, response) => {
+    console.log("Health");
     logger.info('PONG!');
     response.json({ status: 'ok' });
   });

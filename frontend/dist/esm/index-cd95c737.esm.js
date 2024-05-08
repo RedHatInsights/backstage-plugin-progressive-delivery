@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { InfoCard, DependencyGraph, DependencyGraphTypes } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
 const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
+  const config = useApi(configApiRef);
+  const baseUrl = config.getString("backend.baseUrl");
   useEffect(() => {
-    fetch("http://localhost:7007/api/progressive-delivery/topo").then((response) => {
-      console.log(response);
+    fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo").then((response) => {
       return response.text();
     }).then((data) => {
-      console.log(data);
       return setTopo(data);
     });
   }, []);
@@ -157,4 +158,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-4e53575e.esm.js.map
+//# sourceMappingURL=index-cd95c737.esm.js.map

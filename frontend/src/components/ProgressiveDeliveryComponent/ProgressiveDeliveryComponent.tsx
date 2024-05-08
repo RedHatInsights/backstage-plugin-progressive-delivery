@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
@@ -32,13 +32,11 @@ export const TopologyComponent = () => {
   const baseUrl = config.getString('backend.baseUrl');
   
   useEffect(() => {
-    fetch(baseUrl + "/api/progressive-delivery/topo")
+    fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
       .then(response => {
-        console.log(response);
         return response.text();
       })
       .then(data => {
-        console.log(data);
         return setTopo(data);
       })
   }, [])

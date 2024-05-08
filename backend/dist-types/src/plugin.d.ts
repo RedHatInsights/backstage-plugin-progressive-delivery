@@ -1,6 +1,6 @@
 /**
  * The progressive-delivery backend plugin.
  *
- * @alpha
+ * @public
  */
 export declare const progressive_deliveryPlugin: () => import("@backstage/backend-plugin-api").BackendFeature;
