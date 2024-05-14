@@ -21,10 +21,12 @@ interface Node {
     deployment_state: "success" | "missing" | "failed" | undefined;
 }
 
+/*
 interface Edge {
     from: Node;
     to: Node;
 }
+*/
 
 function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   let node_origins: { [key: string]: Set<string> } = {};
@@ -46,7 +48,7 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   }
 
   let multi_origins: { [key: string]: number } = {};
-  for (const [t, origins] of Object.entries(node_origins)) {
+  for (const [_t, origins] of Object.entries(node_origins)) {
       if (origins.size > 1) {
           const originsKey = JSON.stringify(Array.from(origins));
           if (!(originsKey in multi_origins)) {
@@ -107,6 +109,8 @@ export const TopologyComponent = () => {
       </InfoCard>);
     }
 
+    console.log("Data: ", rawData);
+
     let rawEdges = rawData.edges.filter(([f, t])=>{
       const from = JSON.parse(f);
       const to = JSON.parse(t);
@@ -115,13 +119,20 @@ export const TopologyComponent = () => {
 
     rawEdges = simplifyManyToMany(rawEdges);
 
+    console.log("Edges: ", rawEdges);
+
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
+    rawData.nodes.map((n) => JSON.parse(n))
+      .filter((n: Node) => n.app.toLowerCase() == name.toLowerCase())
+      .forEach((n: Node) => uniqueNodeSet.add(JSON.stringify(n)));
 
-    const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet);
+    console.log("Nodes: ", uniqueNodeSet);
+
+    const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
 
     const edges: DependencyGraphTypes.DependencyEdge[] = rawEdges.map(([f,t]) => ({from: f, to: t}));
 

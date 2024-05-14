@@ -4,6 +4,51 @@ import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
+function simplifyManyToMany(edges) {
+  let node_origins = {};
+  for (const [o, t] of edges) {
+    if (!(t in node_origins)) {
+      node_origins[t] = /* @__PURE__ */ new Set();
+    }
+    node_origins[t].add(o);
+  }
+  let node_origins_lookup = {};
+  for (const [k, v] of Object.entries(node_origins)) {
+    const key = JSON.stringify(Array.from(v));
+    if (!(key in node_origins_lookup)) {
+      node_origins_lookup[key] = /* @__PURE__ */ new Set();
+    }
+    node_origins_lookup[key].add(k);
+  }
+  let multi_origins = {};
+  for (const [_t, origins] of Object.entries(node_origins)) {
+    if (origins.size > 1) {
+      const originsKey = JSON.stringify(Array.from(origins));
+      if (!(originsKey in multi_origins)) {
+        multi_origins[originsKey] = 0;
+      }
+      multi_origins[originsKey] += 1;
+    }
+  }
+  let index = 0;
+  for (const [originsKey, count] of Object.entries(multi_origins)) {
+    if (count > 1) {
+      const many_to_many_node = `soak-${index++}`;
+      const origins = JSON.parse(originsKey);
+      const targets = node_origins_lookup[originsKey];
+      for (const o of origins) {
+        for (const t of Array.from(targets)) {
+          edges = edges.filter((edge) => !(edge[0] === o && edge[1] === t));
+          if (!edges.some((e) => e[0] === o && e[1] === many_to_many_node))
+            edges.push([o, many_to_many_node]);
+          if (!edges.some((e) => e[0] === many_to_many_node && e[1] === t))
+            edges.push([many_to_many_node, t]);
+        }
+      }
+    }
+  }
+  return edges;
+}
 const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
   const config = useApi(configApiRef);
@@ -22,17 +67,23 @@ const TopologyComponent = () => {
     } catch {
       return /* @__PURE__ */ React.createElement(InfoCard, { title: "Progressive Delivery Topology" }, "Error parsing json");
     }
-    const edges = rawData.edges.map(([f, t]) => ({
-      from: JSON.parse(f),
-      to: JSON.parse(t)
-    })).filter(({ from, to }) => from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase()).map(
-      ({ from, to }) => ({ from: JSON.stringify(from), to: JSON.stringify(to) })
-    );
-    let nodes = rawData.nodes.map((node) => JSON.parse(node)).filter((n) => n.app.toLowerCase() == name.toLowerCase()).map((n) => ({ id: JSON.stringify(n) }));
-    edges.forEach((e) => {
-      nodes.push({ id: e.from });
-      nodes.push({ id: e.to });
+    console.log("Data: ", rawData);
+    let rawEdges = rawData.edges.filter(([f, t]) => {
+      const from = JSON.parse(f);
+      const to = JSON.parse(t);
+      return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
+    rawEdges = simplifyManyToMany(rawEdges);
+    console.log("Edges: ", rawEdges);
+    const uniqueNodeSet = /* @__PURE__ */ new Set();
+    rawEdges.forEach(([f, t]) => {
+      uniqueNodeSet.add(f);
+      uniqueNodeSet.add(t);
+    });
+    rawData.nodes.map((n) => JSON.parse(n)).filter((n) => n.app.toLowerCase() == name.toLowerCase()).forEach((n) => uniqueNodeSet.add(JSON.stringify(n)));
+    console.log("Nodes: ", uniqueNodeSet);
+    const nodes = Array.from(uniqueNodeSet).map((n) => ({ id: n }));
+    const edges = rawEdges.map(([f, t]) => ({ from: f, to: t }));
     return /* @__PURE__ */ React.createElement(InfoCard, { title: "Progressive Delivery Topology" }, /* @__PURE__ */ React.createElement(
       DependencyGraph,
       {
@@ -158,4 +209,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-cd95c737.esm.js.map
+//# sourceMappingURL=index-6a8bf752.esm.js.map
