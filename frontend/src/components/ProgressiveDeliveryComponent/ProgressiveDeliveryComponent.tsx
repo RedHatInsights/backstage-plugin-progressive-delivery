@@ -30,7 +30,7 @@ export const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
-  
+
   useEffect(() => {
     fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
       .then(response => {
@@ -56,28 +56,28 @@ export const TopologyComponent = () => {
     const edges: DependencyGraphTypes.DependencyEdge[] = rawData.edges.map(([f, t]) => ({
       from: JSON.parse(f),
       to: JSON.parse(t)
-    }))   
+    }))
     .filter(({from, to}: Edge) => from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase())
     .map(({from, to}: Edge) => (
       {from: JSON.stringify(from), to: JSON.stringify(to)})
     );
 
-    let nodes: DependencyGraphTypes.DependencyNode[] = rawData.nodes.map(node => JSON.parse(node))
-    .filter((n: Node) => n.app.toLowerCase() == name.toLowerCase())
-    .map((n: Node) => ({id: JSON.stringify(n)}));
+    const uniqueNodeSet = new Set<DependencyGraphTypes.DependencyNode>();
 
-    edges.forEach((e: DependencyGraphTypes.DependencyEdge) => {
-      nodes.push({id: e.from});
-      nodes.push({id: e.to});
+    edges.forEach(({ from, to}) => {
+      uniqueNodeSet.add(from);
+      uniqueNodeSet.add(to);
     });
+
+    const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet);
 
     return (
       <InfoCard title="Progressive Delivery Topology">
-        <DependencyGraph 
-          nodes={nodes} 
-          edges={edges} 
-          showArrowHeads={true} 
-          renderNode={CustomNodeRenderer} 
+        <DependencyGraph
+          nodes={nodes}
+          edges={edges}
+          showArrowHeads={true}
+          renderNode={CustomNodeRenderer}
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
       </InfoCard>
     );
