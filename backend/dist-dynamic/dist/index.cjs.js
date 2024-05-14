@@ -2,7 +2,7 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var plugin = require('./cjs/plugin-eba63752.cjs.js');
+var plugin = require('./cjs/plugin-fdb79d77.cjs.js');
 require('@backstage/backend-plugin-api');
 require('@backstage/backend-common');
 require('express');

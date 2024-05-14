@@ -1,4 +1,5 @@
 import { errorHandler, loadBackendConfig } from '@backstage/backend-common';
+//import { useApi, configApiRef, identityApiRef } from '@backstage/core-plugin-api';
 import express from 'express';
 import Router from 'express-promise-router';
 //import { Logger } from 'winston';
@@ -24,7 +25,13 @@ export async function createRouter(
   router.get('/topo', (_, response) => {
     loadBackendConfig({logger: logger, argv: []})
       .then((config) => {
-        response.sendFile(config.getString('progressive-delivery.saas-promotions-json'));
+        const key = 'progressive-delivery.saas-promotions-json';
+
+        console.log("SMR KEYS 1", config.keys());
+        console.log("SMR KEYS 2", config.get('progressive-delivery'));
+        console.log("SMR KEYS 3", config.get(key));
+
+        response.sendFile(config.getString(key));
     }).catch((error) => {
         console.log("No config");
         console.log(error);
