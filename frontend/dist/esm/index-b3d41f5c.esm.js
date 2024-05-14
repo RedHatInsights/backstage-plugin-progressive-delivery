@@ -67,21 +67,18 @@ const TopologyComponent = () => {
     } catch {
       return /* @__PURE__ */ React.createElement(InfoCard, { title: "Progressive Delivery Topology" }, "Error parsing json");
     }
-    console.log("Data: ", rawData);
     let rawEdges = rawData.edges.filter(([f, t]) => {
       const from = JSON.parse(f);
       const to = JSON.parse(t);
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
     rawEdges = simplifyManyToMany(rawEdges);
-    console.log("Edges: ", rawEdges);
     const uniqueNodeSet = /* @__PURE__ */ new Set();
     rawEdges.forEach(([f, t]) => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
     rawData.nodes.map((n) => JSON.parse(n)).filter((n) => n.app.toLowerCase() == name.toLowerCase()).forEach((n) => uniqueNodeSet.add(JSON.stringify(n)));
-    console.log("Nodes: ", uniqueNodeSet);
     const nodes = Array.from(uniqueNodeSet).map((n) => ({ id: n }));
     const edges = rawEdges.map(([f, t]) => ({ from: f, to: t }));
     return /* @__PURE__ */ React.createElement(InfoCard, { title: "Progressive Delivery Topology" }, /* @__PURE__ */ React.createElement(
@@ -117,7 +114,35 @@ function CustomNodeRenderer({ node: { id } }) {
   const padding = 10;
   const paddedWidth = width + padding * 2;
   const paddedHeight = height + padding * 2;
-  let node = JSON.parse(id);
+  let node;
+  try {
+    node = JSON.parse(id);
+  } catch {
+    console.warn("Parse error: ", id);
+    console.warn("Assuming this is soak...");
+    const classes2 = useStyles({ isTest: false });
+    return /* @__PURE__ */ React.createElement("g", null, /* @__PURE__ */ React.createElement(
+      "rect",
+      {
+        className: classes2.node,
+        width: paddedWidth,
+        height: paddedHeight,
+        rx: 10
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "text",
+      {
+        ref: idRef,
+        className: classes2.text,
+        y: paddedHeight / 2,
+        x: paddedWidth / 2,
+        textAnchor: "middle",
+        alignmentBaseline: "middle"
+      },
+      id
+    ));
+  }
+  console.log("PostParse: ", node);
   let sha = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32 ? (_a = node.commit_sha) == null ? void 0 : _a.substring(0, 7) : node.commit_sha;
@@ -209,4 +234,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-6a8bf752.esm.js.map
+//# sourceMappingURL=index-b3d41f5c.esm.js.map

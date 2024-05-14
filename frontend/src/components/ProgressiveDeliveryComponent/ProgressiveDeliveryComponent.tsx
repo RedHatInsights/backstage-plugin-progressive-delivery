@@ -21,13 +21,6 @@ interface Node {
     deployment_state: "success" | "missing" | "failed" | undefined;
 }
 
-/*
-interface Edge {
-    from: Node;
-    to: Node;
-}
-*/
-
 function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   let node_origins: { [key: string]: Set<string> } = {};
 
@@ -109,8 +102,6 @@ export const TopologyComponent = () => {
       </InfoCard>);
     }
 
-    console.log("Data: ", rawData);
-
     let rawEdges = rawData.edges.filter(([f, t])=>{
       const from = JSON.parse(f);
       const to = JSON.parse(t);
@@ -118,8 +109,6 @@ export const TopologyComponent = () => {
     });
 
     rawEdges = simplifyManyToMany(rawEdges);
-
-    console.log("Edges: ", rawEdges);
 
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
@@ -129,8 +118,6 @@ export const TopologyComponent = () => {
     rawData.nodes.map((n) => JSON.parse(n))
       .filter((n: Node) => n.app.toLowerCase() == name.toLowerCase())
       .forEach((n: Node) => uniqueNodeSet.add(JSON.stringify(n)));
-
-    console.log("Nodes: ", uniqueNodeSet);
 
     const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
 
@@ -179,7 +166,37 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   const paddedWidth = width + padding * 2;
   const paddedHeight = height + padding * 2;
 
-  let node: Node = JSON.parse(id);
+  let node: Node;
+  try {
+    node = JSON.parse(id);
+  } catch {
+    console.warn("Parse error: ", id);
+    console.warn("Assuming this is soak...");
+
+    const classes = useStyles({ isTest: false });
+
+
+    return (<g>
+      <rect 
+        className={classes.node} 
+        width={paddedWidth}
+        height={paddedHeight}
+        rx={10}
+      />
+      <text
+        ref={idRef}
+        className={classes.text}
+        y={paddedHeight / 2}
+        x={paddedWidth / 2}
+        textAnchor="middle"
+        alignmentBaseline="middle"
+      >
+        {id}
+      </text>
+    </g>);
+  }
+
+  console.log("PostParse: ", node);
   let sha: string = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
