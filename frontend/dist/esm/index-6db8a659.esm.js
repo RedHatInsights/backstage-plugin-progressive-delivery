@@ -142,7 +142,6 @@ function CustomNodeRenderer({ node: { id } }) {
       id
     ));
   }
-  console.log("PostParse: ", node);
   let sha = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32 ? (_a = node.commit_sha) == null ? void 0 : _a.substring(0, 7) : node.commit_sha;
@@ -234,4 +233,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-b3d41f5c.esm.js.map
+//# sourceMappingURL=index-6db8a659.esm.js.map

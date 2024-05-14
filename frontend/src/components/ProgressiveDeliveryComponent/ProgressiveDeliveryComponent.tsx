@@ -196,7 +196,6 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
     </g>);
   }
 
-  console.log("PostParse: ", node);
   let sha: string = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
