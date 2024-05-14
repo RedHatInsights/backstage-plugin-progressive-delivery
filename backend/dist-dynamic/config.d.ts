@@ -2,10 +2,10 @@ export interface Config {
   /**
   * @visibility backend
   */
-  'progressive-delivery': {
+  progressiveDelivery: {
     /**
     * @visibility backend
     */
-    'saas-promotions-json': string;
+    saasPromotionsJson: string;
   }
 }

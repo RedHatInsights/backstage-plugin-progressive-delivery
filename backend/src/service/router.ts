@@ -1,18 +1,22 @@
-import { errorHandler, loadBackendConfig } from '@backstage/backend-common';
+import { errorHandler /*, loadBackendConfig*/ } from '@backstage/backend-common';
 //import { useApi, configApiRef, identityApiRef } from '@backstage/core-plugin-api';
 import express from 'express';
 import Router from 'express-promise-router';
 //import { Logger } from 'winston';
 import { LoggerService } from '@backstage/backend-plugin-api';
+import { Config } from '@backstage/config';
 
 export interface RouterOptions {
   logger: LoggerService;
+  config: Config;
 }
+
+const key = 'progressiveDelivery.saasPromotionsJson';
 
 export async function createRouter(
   options: RouterOptions,
 ): Promise<express.Router> {
-  const { logger } = options;
+  const { logger, config } = options;
 
   const router = Router();
   router.use(express.json());
@@ -23,20 +27,25 @@ export async function createRouter(
     response.json({ status: 'ok' });
   });
   router.get('/topo', (_, response) => {
-    loadBackendConfig({logger: logger, argv: []})
-      .then((config) => {
-        const key = 'progressive-delivery.saas-promotions-json';
+      console.log("SMR KEYS 1", config.keys());
+      console.log("SMR KEYS 2", config.get('progressiveDelivery'));
+      console.log("SMR KEYS 3", config.get(key));
 
-        console.log("SMR KEYS 1", config.keys());
-        console.log("SMR KEYS 2", config.get('progressive-delivery'));
-        console.log("SMR KEYS 3", config.get(key));
-
-        response.sendFile(config.getString(key));
-    }).catch((error) => {
-        console.log("No config");
-        console.log(error);
-        response.sendStatus(500);
-      });
+      response.sendFile(config.getString(key));
+    // loadBackendConfig({logger: logger, argv: []})
+    //   .then((config) => {
+    //     const key = 'progressive-delivery.saas-promotions-json';
+    //
+    //     console.log("SMR KEYS 1", config.keys());
+    //     console.log("SMR KEYS 2", config.get('progressive-delivery'));
+    //     console.log("SMR KEYS 3", config.get(key));
+    //
+    //     response.sendFile(config.getString(key));
+    // }).catch((error) => {
+    //     console.log("No config");
+    //     console.log(error);
+    //     response.sendStatus(500);
+    //   });
   })
   router.use(errorHandler());
   return router;

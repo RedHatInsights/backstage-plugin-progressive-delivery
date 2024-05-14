@@ -15,14 +15,18 @@ export const progressive_deliveryPlugin = createBackendPlugin({
       deps: {
         httpRouter: coreServices.httpRouter,
         logger: coreServices.logger,
+        config: coreServices.rootConfig
       },
       async init({
         httpRouter,
         logger,
+        config,
       }) {
+        console.log("SMR 0: ", config.keys());
         httpRouter.use(
           await createRouter({
             logger,
+            config,
           }),
         );
         httpRouter.addAuthPolicy({

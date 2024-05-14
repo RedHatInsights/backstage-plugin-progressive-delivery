@@ -1,4 +1,5 @@
 import { createServiceBuilder } from '@backstage/backend-common';
+import { Config } from '@backstage/config';
 import { Server } from 'http';
 import { Logger } from 'winston';
 import { createRouter } from './router';
@@ -7,6 +8,7 @@ export interface ServerOptions {
   port: number;
   enableCors: boolean;
   logger: Logger;
+  config: Config;
 }
 
 export async function startStandaloneServer(
@@ -14,8 +16,10 @@ export async function startStandaloneServer(
 ): Promise<Server> {
   const logger = options.logger.child({ service: 'progressive-delivery-backend' });
   logger.debug('Starting application server...');
+  const config = options.config;
   const router = await createRouter({
     logger,
+    config,
   });
 
   let service = createServiceBuilder(module)
