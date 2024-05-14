@@ -1,11 +1,11 @@
 {
   "name": "plugin-progressive-delivery",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "extensions": [],
   "registrationMethod": "callback",
   "baseURL": "auto",
   "loadScripts": [
-    "plugin-progressive-delivery.628ae8bd3536529d3d14.js"
+    "plugin-progressive-delivery.91901bbe21a144085974.js"
   ],
-  "buildHash": "628ae8bd3536529d3d14c6513f3c23c8"
+  "buildHash": "91901bbe21a14408597402880fd084c9"
 }
