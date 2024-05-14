@@ -26,6 +26,60 @@ interface Edge {
     to: Node;
 }
 
+function simplifyManyToMany(edges: [string, string][]): [string, string][] {
+  let node_origins: { [key: string]: Set<string> } = {};
+
+  for (const [o, t] of edges) {
+    if (!(t in node_origins)) {
+      node_origins[t] = new Set();
+    }
+    node_origins[t].add(o);
+}
+
+  let node_origins_lookup: { [key: string]: Set<string> } = {};
+  for (const [k, v] of Object.entries(node_origins)) {
+      const key = JSON.stringify(Array.from(v));
+      if (!(key in node_origins_lookup)) {
+          node_origins_lookup[key] = new Set();
+      }
+      node_origins_lookup[key].add(k);
+  }
+
+  let multi_origins: { [key: string]: number } = {};
+  for (const [t, origins] of Object.entries(node_origins)) {
+      if (origins.size > 1) {
+          const originsKey = JSON.stringify(Array.from(origins));
+          if (!(originsKey in multi_origins)) {
+              multi_origins[originsKey] = 0;
+          }
+          multi_origins[originsKey] += 1;
+      }
+  }
+
+  let index = 0;
+  for (const [originsKey, count] of Object.entries(multi_origins)) {
+      if (count > 1) {
+          const many_to_many_node = `soak-${index++}`;
+          const origins = JSON.parse(originsKey) as string[];
+          const targets = node_origins_lookup[originsKey];
+          for (const o of origins) {
+              for (const t of Array.from(targets)) {
+                  edges = edges.filter(edge => !(edge[0] === o && edge[1] === t));
+
+                  if (!edges.some(e => e[0] === o && e[1] === many_to_many_node))
+                    edges.push([o, many_to_many_node]);
+
+                  if (!edges.some(e => e[0] === many_to_many_node && e[1] === t))
+                    edges.push([many_to_many_node, t]);
+              }
+          }
+      }
+  }
+
+  return edges;
+}
+
+
 export const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
   const config = useApi(configApiRef);
@@ -53,23 +107,23 @@ export const TopologyComponent = () => {
       </InfoCard>);
     }
 
-    const edges: DependencyGraphTypes.DependencyEdge[] = rawData.edges.map(([f, t]) => ({
-      from: JSON.parse(f),
-      to: JSON.parse(t)
-    }))
-    .filter(({from, to}: Edge) => from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase())
-    .map(({from, to}: Edge) => (
-      {from: JSON.stringify(from), to: JSON.stringify(to)})
-    );
+    let rawEdges = rawData.edges.filter(([f, t])=>{
+      const from = JSON.parse(f);
+      const to = JSON.parse(t);
+      return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
+    });
 
-    const uniqueNodeSet = new Set<DependencyGraphTypes.DependencyNode>();
+    rawEdges = simplifyManyToMany(rawEdges);
 
-    edges.forEach(({ from, to}) => {
-      uniqueNodeSet.add(from);
-      uniqueNodeSet.add(to);
+    const uniqueNodeSet = new Set<string>();
+    rawEdges.forEach(([f, t]) => {
+      uniqueNodeSet.add(f);
+      uniqueNodeSet.add(t);
     });
 
     const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet);
+
+    const edges: DependencyGraphTypes.DependencyEdge[] = rawEdges.map(([f,t]) => ({from: f, to: t}));
 
     return (
       <InfoCard title="Progressive Delivery Topology">
