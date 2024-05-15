@@ -20,7 +20,6 @@ export async function createRouter(
   router.use(express.json());
 
   router.get('/health', (_, response) => {
-    console.log("Health");
     logger.info('PONG!');
     response.json({ status: 'ok' });
   });

@@ -22,7 +22,6 @@ export const progressive_deliveryPlugin = createBackendPlugin({
         logger,
         config,
       }) {
-        console.log("SMR 0: ", config.keys());
         httpRouter.use(
           await createRouter({
             logger,
