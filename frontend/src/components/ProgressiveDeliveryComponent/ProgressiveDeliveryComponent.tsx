@@ -115,9 +115,6 @@ export const TopologyComponent = () => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
-    rawData.nodes.map((n) => JSON.parse(n))
-      .filter((n: Node) => n.app.toLowerCase() == name.toLowerCase())
-      .forEach((n: Node) => uniqueNodeSet.add(JSON.stringify(n)));
 
     const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
 
