@@ -4,6 +4,8 @@ import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, useApi } from '@backstage/core-plugin-api';
 
+const MANY_TO_MANY_NODE_LABEL = "soak";
+
 interface SaasPromotionsData {
     nodes: string[];
     edges: [string, string][];
@@ -54,7 +56,7 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   let index = 0;
   for (const [originsKey, count] of Object.entries(multi_origins)) {
       if (count > 1) {
-          const many_to_many_node = `soak-${index++}`;
+          const many_to_many_node = `${MANY_TO_MANY_NODE_LABEL}-${index++}`;
           const origins = JSON.parse(originsKey) as string[];
           const targets = node_origins_lookup[originsKey];
           for (const o of origins) {
@@ -115,9 +117,6 @@ export const TopologyComponent = () => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
-    rawData.nodes.map((n) => JSON.parse(n))
-      .filter((n: Node) => n.app.toLowerCase() == name.toLowerCase())
-      .forEach((n: Node) => uniqueNodeSet.add(JSON.stringify(n)));
 
     const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
 
@@ -166,19 +165,11 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   const paddedWidth = width + padding * 2;
   const paddedHeight = height + padding * 2;
 
-  let node: Node;
-  try {
-    node = JSON.parse(id);
-  } catch {
-    console.warn("Parse error: ", id);
-    console.warn("Assuming this is soak...");
-
+  if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
     const classes = useStyles({ isTest: false });
-
-
     return (<g>
-      <rect 
-        className={classes.node} 
+      <rect
+        className={classes.node}
         width={paddedWidth}
         height={paddedHeight}
         rx={10}
@@ -191,10 +182,12 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
         textAnchor="middle"
         alignmentBaseline="middle"
       >
-        {id}
+        {MANY_TO_MANY_NODE_LABEL}
       </text>
     </g>);
   }
+
+  const node: Node = JSON.parse(id);
 
   let sha: string = "none";
   if (node.commit_sha) {
