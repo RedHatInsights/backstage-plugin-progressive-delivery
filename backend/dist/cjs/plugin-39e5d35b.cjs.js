@@ -16,14 +16,10 @@ async function createRouter(options) {
   const router = Router__default["default"]();
   router.use(express__default["default"].json());
   router.get("/health", (_, response) => {
-    console.log("Health");
     logger.info("PONG!");
     response.json({ status: "ok" });
   });
   router.get("/topo", (_, response) => {
-    console.log("SMR KEYS 1", config.keys());
-    console.log("SMR KEYS 2", config.get("progressiveDelivery"));
-    console.log("SMR KEYS 3", config.get(key));
     response.sendFile(config.getString(key));
   });
   router.use(backendCommon.errorHandler());
@@ -44,7 +40,6 @@ const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
         logger,
         config
       }) {
-        console.log("SMR 0: ", config.keys());
         httpRouter.use(
           await createRouter({
             logger,
@@ -66,4 +61,4 @@ const progressive_deliveryPlugin = backendPluginApi.createBackendPlugin({
 
 exports.createRouter = createRouter;
 exports.progressive_deliveryPlugin = progressive_deliveryPlugin;
-//# sourceMappingURL=plugin-ac704155.cjs.js.map
+//# sourceMappingURL=plugin-39e5d35b.cjs.js.map

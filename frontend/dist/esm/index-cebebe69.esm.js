@@ -4,6 +4,7 @@ import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useApi, configApiRef } from '@backstage/core-plugin-api';
 
+const MANY_TO_MANY_NODE_LABEL = "soak";
 function simplifyManyToMany(edges) {
   let node_origins = {};
   for (const [o, t] of edges) {
@@ -33,7 +34,7 @@ function simplifyManyToMany(edges) {
   let index = 0;
   for (const [originsKey, count] of Object.entries(multi_origins)) {
     if (count > 1) {
-      const many_to_many_node = `soak-${index++}`;
+      const many_to_many_node = `${MANY_TO_MANY_NODE_LABEL}-${index++}`;
       const origins = JSON.parse(originsKey);
       const targets = node_origins_lookup[originsKey];
       for (const o of origins) {
@@ -78,7 +79,6 @@ const TopologyComponent = () => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
-    rawData.nodes.map((n) => JSON.parse(n)).filter((n) => n.app.toLowerCase() == name.toLowerCase()).forEach((n) => uniqueNodeSet.add(JSON.stringify(n)));
     const nodes = Array.from(uniqueNodeSet).map((n) => ({ id: n }));
     const edges = rawEdges.map(([f, t]) => ({ from: f, to: t }));
     return /* @__PURE__ */ React.createElement(InfoCard, { title: "Progressive Delivery Topology" }, /* @__PURE__ */ React.createElement(
@@ -88,6 +88,7 @@ const TopologyComponent = () => {
         edges,
         showArrowHeads: true,
         renderNode: CustomNodeRenderer,
+        fit: "contain",
         direction: DependencyGraphTypes.Direction.LEFT_RIGHT
       }
     ));
@@ -114,12 +115,7 @@ function CustomNodeRenderer({ node: { id } }) {
   const padding = 10;
   const paddedWidth = width + padding * 2;
   const paddedHeight = height + padding * 2;
-  let node;
-  try {
-    node = JSON.parse(id);
-  } catch {
-    console.warn("Parse error: ", id);
-    console.warn("Assuming this is soak...");
+  if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
     const classes2 = useStyles({ isTest: false });
     return /* @__PURE__ */ React.createElement("g", null, /* @__PURE__ */ React.createElement(
       "rect",
@@ -139,9 +135,10 @@ function CustomNodeRenderer({ node: { id } }) {
         textAnchor: "middle",
         alignmentBaseline: "middle"
       },
-      id
+      MANY_TO_MANY_NODE_LABEL
     ));
   }
+  const node = JSON.parse(id);
   let sha = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32 ? (_a = node.commit_sha) == null ? void 0 : _a.substring(0, 7) : node.commit_sha;
@@ -233,4 +230,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-6db8a659.esm.js.map
+//# sourceMappingURL=index-cebebe69.esm.js.map
