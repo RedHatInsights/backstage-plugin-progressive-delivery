@@ -165,7 +165,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   const paddedWidth = width + padding * 2;
   const paddedHeight = height + padding * 2;
 
-  if (id.startswith(MANY_TO_MANY_NODE_LABEL)) {
+  if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
     const classes = useStyles({ isTest: false });
     return (<g>
       <rect
