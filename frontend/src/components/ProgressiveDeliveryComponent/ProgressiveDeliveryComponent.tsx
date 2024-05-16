@@ -92,7 +92,11 @@ export const TopologyComponent = () => {
       })
   }, [])
 
-  const name = useEntity().entity.metadata.name.toLowerCase();
+  const entity = useEntity().entity;
+  let name = entity.metadata.name.toLowerCase();
+  if (entity.spec && entity.spec.system) {
+    name = entity.spec.system.toString()
+  }
 
   if (topo !== "{}") {
     try {

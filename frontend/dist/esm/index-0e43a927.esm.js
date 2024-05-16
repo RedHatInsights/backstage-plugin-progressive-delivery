@@ -61,7 +61,11 @@ const TopologyComponent = () => {
       return setTopo(data);
     });
   }, []);
-  const name = useEntity().entity.metadata.name.toLowerCase();
+  const entity = useEntity().entity;
+  let name = entity.metadata.name.toLowerCase();
+  if (entity.spec && entity.spec.system) {
+    name = entity.spec.system.toString();
+  }
   if (topo !== "{}") {
     try {
       var rawData = JSON.parse(topo);
@@ -88,7 +92,6 @@ const TopologyComponent = () => {
         edges,
         showArrowHeads: true,
         renderNode: CustomNodeRenderer,
-        fit: "contain",
         direction: DependencyGraphTypes.Direction.LEFT_RIGHT
       }
     ));
@@ -230,4 +233,4 @@ function extractBool(props) {
 }
 
 export { TopologyComponent };
-//# sourceMappingURL=index-cebebe69.esm.js.map
+//# sourceMappingURL=index-0e43a927.esm.js.map
