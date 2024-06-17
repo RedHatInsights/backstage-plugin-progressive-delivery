@@ -6,7 +6,7 @@ import { configApiRef, useApi } from '@backstage/core-plugin-api';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
-interface SaasPromotionsData {
+export interface SaasPromotionsData {
     nodes: string[];
     edges: [string, string][];
 }
@@ -103,9 +103,10 @@ export const TopologyComponent = () => {
       var rawData: SaasPromotionsData = JSON.parse(topo);
     } catch {
       return (
-      <InfoCard title="Progressive Delivery Topology">
-        Error parsing json
-      </InfoCard>);
+        <InfoCard title="Progressive Delivery Topology">
+          Error parsing json
+        </InfoCard>
+      );
     }
 
     let rawEdges = rawData.edges.filter(([f, t])=>{
@@ -219,6 +220,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   });
 
   const classes = useStyles({ isTest: node.isTest });
+
   return (
     <g>
       <rect
