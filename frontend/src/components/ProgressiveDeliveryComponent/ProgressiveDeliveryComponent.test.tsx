@@ -25,31 +25,35 @@ jest.mock('@backstage/plugin-catalog-react', () => ({
       metadata: {
         name: 'foo',
         spec: {
-          sysystem: 'bar',
+          system: 'baz',
         }
       },
     },
   })
 }));
 
-// const data: SaasPromotionsData =  {
-//   nodes: [
-//     "{\"app\": \"foo\", \"cluster\": \"bar-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
-//     "{\"app\": \"bar\", \"cluster\": null, \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
-//   ],
-//   edges: [
-//     [
-//       "{\"app\": \"foo\", \"cluster\": \"bar-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
-//       "{\"app\": \"bar\", \"cluster\": null, \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
-//     ]
-//   ]
-// };
-
 const data: SaasPromotionsData =  {
   nodes: [
-    "{\"app\": \"bar\", \"cluster\": null, \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
+    "{\"app\": \"foo\", \"cluster\": \"foo-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
+    "{\"app\": \"bar\", \"cluster\": \"bar-stage-01\", \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": \"null\", \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}",
+    "{\"app\": \"baz\", \"cluster\": \"baz-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
+    "{\"app\": \"qux\", \"cluster\": \"qux-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
+    "{\"app\": \"quux\", \"cluster\": \"quux-stage-01\", \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
   ],
-  edges: []
+  edges: [
+    [
+      "{\"app\": \"foo\", \"cluster\": \"foo-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
+      "{\"app\": \"bar\", \"cluster\": \"bar-stage-01\", \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
+    ],
+    [
+      "{\"app\": \"bar\", \"cluster\": \"bar-stage-01\", \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}",
+      "{\"app\": \"baz\", \"cluster\": \"baz-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}"
+    ],
+    [
+      "{\"app\": \"qux\", \"cluster\": \"qux-stage-01\", \"commit_sha\": \"sha\", \"deployment_state\": \"success\", \"isTest\": false, \"namespace\": \"foo-stage\", \"resourceTemplate\": \"foo\", \"saas\": \"foo\", \"target\": null}",
+      "{\"app\": \"quux\", \"cluster\": \"quux-stage-01\", \"commit_sha\": \"\", \"deployment_state\": \"\", \"isTest\": false, \"namespace\": null, \"resourceTemplate\": \"baz-demo\", \"saas\": \"saas-baz-demo-a\", \"target\": \"baz-demo-integration-a\"}"
+    ]
+  ]
 };
 
 describe('ExampleComponent', () => {
@@ -78,6 +82,13 @@ describe('ExampleComponent', () => {
     );
   });
 
+  beforeAll(() => {
+    Object.defineProperty(window.SVGElement.prototype, 'getBBox', {
+      value: () => ({ width: 100, height: 100 }),
+      configurable: true,
+    });
+  });
+
   afterEach(() => {
     jest.restoreAllMocks();
   })
@@ -88,8 +99,15 @@ describe('ExampleComponent', () => {
           <TopologyComponent />
         </TestApiProvider>
     );
-    await expect(screen.getByText('Progressive Delivery Topology')).resolves.toBeInTheDocument();
-    // expect(screen.getByText('Processing ...')).toBeInTheDocument();
-    // expect(screen.getByText('foo')).toBeInTheDocument();
+
+    expect(screen.getByText('Progressive Delivery Topology')).toBeInTheDocument();
+    expect(document.getElementsByTagName('svg').length).toEqual(2);
+    expect(screen.queryByText('sha ✅')).toBeInTheDocument();
+    expect(screen.queryByText('none ❌')).toBeInTheDocument();
+    expect(screen.queryByText('on foo-stage-01/foo-stage (foo)')).toBeInTheDocument();
+    expect(screen.queryByText('on bar-stage-01/null (saas-baz-demo-a)')).toBeInTheDocument();
+    expect(screen.queryByText('on baz-stage-01/foo-stage (foo)')).toBeNull();
+    expect(screen.queryByText('on qux-stage-01/foo-stage (foo)')).toBeNull();
+    expect(screen.queryByText('on quux-stage-01/null (saas-baz-demo-a)')).toBeNull();
   });
-});
+})

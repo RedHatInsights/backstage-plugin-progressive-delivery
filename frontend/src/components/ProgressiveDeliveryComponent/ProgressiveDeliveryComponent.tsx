@@ -85,7 +85,6 @@ export const TopologyComponent = () => {
   useEffect(() => {
     fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
       .then(response => {
-        console.log("TEXT:", response.text());
         return response.text();
       })
       .then(data => {
@@ -128,9 +127,6 @@ export const TopologyComponent = () => {
 
     const edges: DependencyGraphTypes.DependencyEdge[] = rawEdges.map(([f,t]) => ({from: f, to: t}));
 
-    console.log("NODES: ", nodes);
-    console.log("EDGES: ", edges);
-
     return (
       <InfoCard title="Progressive Delivery Topology">
         <DependencyGraph
@@ -154,8 +150,6 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   const [width, setWidth] = React.useState(0);
   const [height, setHeight] = React.useState(0);
   const idRef = React.useRef<SVGTextElement | null>(null);
-
-  console.log("RENDERING",  id);
 
   React.useLayoutEffect(() => {
     // set the width to the length of the ID
@@ -200,8 +194,6 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
 
   const node: Node = JSON.parse(id);
 
-  console.log("RENDERING NODE",  node);
-
   let sha: string = "none";
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
@@ -213,8 +205,6 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
     `on ${node.cluster}/${node.namespace} (${node.saas})`,
     `${sha} ${dep}`,
   ];
-
-  console.log("RENDERING label",  label);
   let tspans = label.map((l, i) => {
     return (
       <tspan
@@ -229,9 +219,8 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
       </tspan>);
   });
 
-  console.log("RENDERING idRef",  idRef);
   const classes = useStyles({ isTest: node.isTest });
-  console.log("RENDERING class",  classes);
+
   return (
     <g>
       <rect
