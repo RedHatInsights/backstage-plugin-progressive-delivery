@@ -2,7 +2,7 @@ import React, { useEffect, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
+import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -80,10 +80,11 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 export const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
   const config = useApi(configApiRef);
+  const fetchApi = useApi(fetchApiRef);
   const baseUrl = config.getString('backend.baseUrl');
 
   useEffect(() => {
-    fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
+    fetchApi.fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
       .then(response => {
         return response.text();
       })
