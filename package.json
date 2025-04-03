@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@backstage/cli": "^0.31.1"
+  },
+  "version": "0.0.0"
+}
