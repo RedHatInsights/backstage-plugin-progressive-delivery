@@ -199,7 +199,15 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
   }
-  let dep: string = node.deployment_state == "success" ? '✅' : '❌';
+    var dep = "";
+    switch (node.deployment_state) {
+      case  "success":
+          dep = '✅'
+            break;
+      case "failed":
+          dep = '❌'
+            break;
+  }
   const num_of_bolds: number = 1;
   let label: string[] = [
     `${node.resourceTemplate}/${node.target}`,
