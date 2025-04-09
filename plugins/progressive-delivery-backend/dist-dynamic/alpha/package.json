@@ -1,0 +1,5 @@
+{
+  "name": "@redhatinsights/backstage-plugin-progressive-delivery-backend-dynamic",
+  "version": "0.1.2",
+  "main": "../dist/alpha.cjs.js"
+}
