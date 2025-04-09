@@ -1,1 +1,1 @@
-export { progressiveDeliveryPlugin, ProgressiveDeliveryPage } from './plugin';
+export { progressiveDeliveryPlugin, EntityProgressiveDeliveryContent } from './plugin';
