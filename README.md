@@ -1,5 +1,7 @@
 # Progressive Delivery
 
+### Description
+
 In accordance with `SD ADR 0032`, each artifact that is a part of
 delivering/operating a managed OCP cluster has to implement progressive
 delivery.  This ADR was extended in `SD-ADR-0110` to provide a design for
@@ -14,3 +16,12 @@ where.  This plugin provides a visual representation of the collections of
 piplines in order to verify a correct structure.  This plugin also shows
 deployment status and latest commit sha per target so service owners can see
 how far along a given deployment is.
+
+### Packaging
+
+Run the following script to build/package the plugin
+```
+./frontend/build
+```
+
+A `tgz` will be created in the `frontend` directory of the repo.
