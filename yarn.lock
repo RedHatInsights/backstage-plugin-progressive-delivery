@@ -11656,7 +11656,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redhatinsights/backstage-plugin-progressive-delivery-backend@workspace:plugins/progressive-delivery-backend":
+"@redhatinsights/backstage-plugin-progressive-delivery-backend@npm:^0.1.2, @redhatinsights/backstage-plugin-progressive-delivery-backend@workspace:plugins/progressive-delivery-backend":
   version: 0.0.0-use.local
   resolution: "@redhatinsights/backstage-plugin-progressive-delivery-backend@workspace:plugins/progressive-delivery-backend"
   dependencies:
@@ -17201,6 +17201,7 @@ __metadata:
     "@backstage/plugin-search-backend-module-techdocs": "npm:^0.4.0"
     "@backstage/plugin-search-backend-node": "npm:^1.3.9"
     "@backstage/plugin-techdocs-backend": "npm:^2.0.0"
+    "@redhatinsights/backstage-plugin-progressive-delivery-backend": "npm:^0.1.2"
     app: "link:../app"
     better-sqlite3: "npm:^9.0.0"
     node-gyp: "npm:^10.0.0"

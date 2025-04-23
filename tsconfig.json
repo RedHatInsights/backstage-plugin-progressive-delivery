@@ -11,10 +11,6 @@
   "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "dist-types",
-    "rootDir": ".",
-    "paths": {
-        "@redhatinsights/backstage-plugin-progressive-delivery-frontend": ["./plugins/progressive-delivery-frontend"],
-        "@redhatinsights/backstage-plugin-progressive-delivery-backend": ["./plugins/progressive-delivery-backend"]
-    }
+    "rootDir": "."
   }
 }

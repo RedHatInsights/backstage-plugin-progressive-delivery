@@ -19,11 +19,15 @@ export async function createRouter(
   const router = Router();
   router.use(express.json());
 
+  logger.info("config", config)
+  logger.info("keyyyyyyyy", key)
+
   router.get('/health', (_, response) => {
     logger.info('PONG!');
     response.json({ status: 'ok' });
   });
   router.get('/topo', (_, response) => {
+    logger.info("WHERE IS IT", config.getString(key))
     response.sendFile(config.getString(key));
   })
   router.use(errorHandler());

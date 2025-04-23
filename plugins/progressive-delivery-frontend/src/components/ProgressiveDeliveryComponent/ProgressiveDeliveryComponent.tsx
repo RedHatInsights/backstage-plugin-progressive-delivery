@@ -110,7 +110,7 @@ export const TopologyComponent = () => {
       );
     }
 
-    let rawEdges = rawData.edges.filter(([f, t])=>{
+    let rawEdges = rawData?.edges?.filter(([f, t])=>{
       const from = JSON.parse(f);
       const to = JSON.parse(t);
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();

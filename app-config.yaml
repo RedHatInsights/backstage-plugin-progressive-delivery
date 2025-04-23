@@ -5,7 +5,7 @@ ocm:
   web-rca-url: https://api.stage.openshift
 
 progressive-delivery:
-  saas-promotions-json: /var/opt/progressive-delivery/saas-promotions.json # saas-promotions/saas-promotions.json
+  saas-promotions-json: "/var/opt/progressive-delivery/saas-promotions.json"
 
 organization:
   name: My Company
@@ -61,15 +61,12 @@ proxy:
   '/web-rca':
     target: 'https://api.stage.openshift.com/api/web-rca/v1'
     allowedHeaders: ['Authorization']
-    credentials: dangerously-allow-unauthenticated
   '/status-board':
     target: 'https://api.stage.openshift.com/api/status-board/v1'
     allowedHeaders: ['Authorization']
-    credentials: dangerously-allow-unauthenticated
   '/sso-redhat':
     target: 'https://sso.redhat.com'
     allowedHeaders: ['Content-Type'] 
-    credentials: dangerously-allow-unauthenticated
 
 # Reference documentation http://backstage.io/docs/features/techdocs/configuration
 # Note: After experimenting with basic setup, use CI/CD to generate docs
@@ -140,5 +137,3 @@ kubernetes:
           authProvider: 'serviceAccount'
           skipTLSVerify: true
           serviceAccountToken: temp
-
-# ------------------------------------------------------------------------------------
