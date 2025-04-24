@@ -13,11 +13,6 @@
   "backstage": {
     "role": "backend-plugin"
   },
-  "exports": {
-    ".": "./src/index.ts",
-    "./alpha": "./src/alpha.ts",
-    "./package.json": "./package.json"
-  },
   "typesVersions": {
     "*": {
       "alpha": [
