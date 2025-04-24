@@ -4,8 +4,7 @@ app:
 ocm:
   web-rca-url: https://api.stage.openshift
 
-progressive-delivery:
-  saas-promotions-json: "/var/opt/progressive-delivery/saas-promotions.json"
+saasPromotionsJson: '/var/opt/progressive-delivery/saas-promotions.json'
 
 organization:
   name: My Company

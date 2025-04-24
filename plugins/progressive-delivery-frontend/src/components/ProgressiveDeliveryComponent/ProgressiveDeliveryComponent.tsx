@@ -83,15 +83,10 @@ export const TopologyComponent = () => {
   const fetchApi = useApi(fetchApiRef);
   const baseUrl = config.getString('backend.baseUrl');
 
-  useEffect(() => {
-    fetchApi.fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
-      .then(response => {
-        return response.text();
-      })
-      .then(data => {
-        return setTopo(data);
-      })
-  }, [])
+  console.log("config:", config)
+  const saasPromotionsJson = config.getString('progressiveDelivery.saasPromotionsJson')
+
+  console.log("saasPromotionsJson:", saasPromotionsJson);
 
   const entity = useEntity().entity;
   let name = entity.metadata.name.toLowerCase();
