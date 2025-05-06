@@ -2,7 +2,7 @@ import React, { useEffect, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
-import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
+import { configApiRef, useApi } from '@backstage/core-plugin-api';
 import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
@@ -81,15 +81,16 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 export const TopologyComponent = () => {
   const [topo, setTopo] = useState("{}");
   const config = useApi(configApiRef);
-  const fetchApi = useApi(fetchApiRef);
   const baseUrl = config.getString('backend.baseUrl');
 
   console.log("config:", config);
 
-  useQuerySaasPromotionsData()
-  .then((data) => {
-      setTopo(data)
-  })
+  //if (topo === "{}") {
+      useQuerySaasPromotionsData()
+        .then((data) => {
+          setTopo(data)
+        });
+  //}
 
   console.log("topo:", topo)
   const entity = useEntity().entity;
