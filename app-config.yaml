@@ -48,6 +48,15 @@ proxy:
     '/sso-redhat':
       target: 'https://sso.redhat.com'
       allowedHeaders: ['Content-Type']
+    '/inscope-resources':
+      target: '${INSCOPE_RESOURCES_URL}'
+      #changeOrigin: true
+      #secure: false
+    '/inscope-resources/resources/images':
+      target: '${INSCOPE_RESOURCES_URL}'
+      #changeOrigin: true
+      #secure: false
+
 
 lighthouse:
   baseUrl: temp

@@ -3,6 +3,7 @@ import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
+import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -31,7 +32,7 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
       node_origins[t] = new Set();
     }
     node_origins[t].add(o);
-}
+  }
 
   let node_origins_lookup: { [key: string]: Set<string> } = {};
   for (const [k, v] of Object.entries(node_origins)) {
@@ -83,40 +84,40 @@ export const TopologyComponent = () => {
   const fetchApi = useApi(fetchApiRef);
   const baseUrl = config.getString('backend.baseUrl');
 
-  useEffect(() => {
-    fetchApi.fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
-      .then(response => {
-        return response.text();
-      })
-      .then(data => {
-        return setTopo(data);
-      })
-  }, [])
+  console.log("config:", config);
 
+  useQuerySaasPromotionsData()
+  .then((data) => {
+      setTopo(data)
+  })
+
+  console.log("topo:", topo)
   const entity = useEntity().entity;
-  let name = entity.metadata.name.toLowerCase();
-  if (entity.spec && entity.spec.system) {
-    name = entity.spec.system.toString()
-  }
 
-  if (topo !== "{}") {
-    try {
-      var rawData: SaasPromotionsData = JSON.parse(topo);
-    } catch {
-      return (
-        <InfoCard title="Progressive Delivery Topology">
-          Error parsing json
-        </InfoCard>
-      );
+  const [nodes, setNodes] = useState<DependencyGraphTypes.DependencyNode[]>({});
+  const [edges, setEdges] = useState<DependencyGraphTypes.DependencyEdge[]>({});
+
+  const populateNodesEdges = () => {
+    if (topo === "{}") return;
+
+    let name = entity.metadata.name.toLowerCase();
+    if (entity.spec && entity.spec.system) {
+      name = entity.spec.system.toString()
     }
 
-    let rawEdges = rawData.edges.filter(([f, t])=>{
+    console.log("name:", name)
+
+    console.log("inner topo:", topo)
+
+    let rawEdges = topo.edges.filter(([f,t]) =>{
       const from = JSON.parse(f);
-      const to = JSON.parse(t);
+      const to = JSON.parse(t); 
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
+    console.log("rawEdges 1:", rawEdges)
 
     rawEdges = simplifyManyToMany(rawEdges);
+    console.log("rawEdges 2:", rawEdges)
 
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
@@ -124,10 +125,23 @@ export const TopologyComponent = () => {
       uniqueNodeSet.add(t);
     });
 
-    const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
+    setNodes(Array.from(uniqueNodeSet).map((n: string) => ({ id: n})))
+    setEdges(rawEdges.map(([f,t]) => ({from: f, to: t})))
+  }
 
-    const edges: DependencyGraphTypes.DependencyEdge[] = rawEdges.map(([f,t]) => ({from: f, to: t}));
+  useEffect(() => {
+    populateNodesEdges();
+  }, [topo]);
+     
+  if (!nodes && !edges) {
+    return (
+      <InfoCard title="Progressive Delivery Topology">
+        Processing ...
+      </InfoCard>
+    );
+  }
 
+  if (nodes.length !== 0 && edges.length !== 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
         <DependencyGraph
@@ -136,12 +150,6 @@ export const TopologyComponent = () => {
           showArrowHeads={true}
           renderNode={CustomNodeRenderer}
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
-      </InfoCard>
-    );
-  } else {
-    return (
-      <InfoCard title="Progressive Delivery Topology">
-        Processing ...
       </InfoCard>
     );
   }
