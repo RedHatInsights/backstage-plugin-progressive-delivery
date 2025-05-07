@@ -3,6 +3,7 @@ import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
+//import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -31,7 +32,7 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
       node_origins[t] = new Set();
     }
     node_origins[t].add(o);
-}
+  }
 
   let node_origins_lookup: { [key: string]: Set<string> } = {};
   for (const [k, v] of Object.entries(node_origins)) {
@@ -76,43 +77,57 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   return edges;
 }
 
-
 export const TopologyComponent = () => {
-  const [topo, setTopo] = useState("{}");
+  const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+
   const config = useApi(configApiRef);
-  const fetchApi = useApi(fetchApiRef);
   const baseUrl = config.getString('backend.baseUrl');
+  const fetchApi = useApi(fetchApiRef);
+
+  const querySaasPromotionsData = () => {
+    setIsLoading(true);
+    setError(false);
+    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/resources/json/saas-promotions.json`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error(`Network response was not ok ${response.statusText}`);
+        }
+
+        return response.text();
+    }).then(data => {
+        var rawData: SaasPromotionsData = JSON.parse(data);
+        setTopo(rawData);
+        setIsLoading(false)
+    }).catch((_error) => {
+        setError(true)
+        setIsLoading(false)
+    });
+  }
 
   useEffect(() => {
-    fetchApi.fetch(baseUrl + "/api/plugin-progressive-delivery-backend/topo")
-      .then(response => {
-        return response.text();
-      })
-      .then(data => {
-        return setTopo(data);
-      })
+    querySaasPromotionsData();
   }, [])
 
   const entity = useEntity().entity;
-  let name = entity.metadata.name.toLowerCase();
-  if (entity.spec && entity.spec.system) {
-    name = entity.spec.system.toString()
-  }
 
-  if (topo !== "{}") {
-    try {
-      var rawData: SaasPromotionsData = JSON.parse(topo);
-    } catch {
-      return (
-        <InfoCard title="Progressive Delivery Topology">
-          Error parsing json
-        </InfoCard>
-      );
+  const [nodes, setNodes] = useState<DependencyGraphTypes.DependencyNode[]>({});
+  const [edges, setEdges] = useState<DependencyGraphTypes.DependencyEdge[]>({});
+
+  const populateNodesEdges = () => {
+    let name = entity.metadata.name.toLowerCase();
+    if (entity.spec && entity.spec.system) {
+      name = entity.spec.system.toString()
     }
 
-    let rawEdges = rawData.edges.filter(([f, t])=>{
+    let rawEdges = topo.edges.filter(([f,t]) =>{
       const from = JSON.parse(f);
-      const to = JSON.parse(t);
+      const to = JSON.parse(t); 
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
 
@@ -124,10 +139,31 @@ export const TopologyComponent = () => {
       uniqueNodeSet.add(t);
     });
 
-    const nodes: DependencyGraphTypes.DependencyNode[] = Array.from(uniqueNodeSet).map((n: string) => ({ id: n}));
+    setNodes(Array.from(uniqueNodeSet).map((n: string) => ({ id: n})))
+    setEdges(rawEdges.map(([f,t]) => ({from: f, to: t})))
+  }
 
-    const edges: DependencyGraphTypes.DependencyEdge[] = rawEdges.map(([f,t]) => ({from: f, to: t}));
+  useEffect(() => {
+    populateNodesEdges();
+  }, [topo]);
+     
+  if (isLoading) {
+    return (
+      <InfoCard title="Progressive Delivery Topology">
+        Processing ...
+      </InfoCard>
+    );
+  }
 
+  if (error) {
+    return (
+      <InfoCard title="Progressive Delivery Topology">
+        There was an error
+      </InfoCard>
+    );
+  }
+
+  if (nodes.length !== 0 && edges.length !== 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
         <DependencyGraph
@@ -136,12 +172,6 @@ export const TopologyComponent = () => {
           showArrowHeads={true}
           renderNode={CustomNodeRenderer}
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
-      </InfoCard>
-    );
-  } else {
-    return (
-      <InfoCard title="Progressive Delivery Topology">
-        Processing ...
       </InfoCard>
     );
   }
