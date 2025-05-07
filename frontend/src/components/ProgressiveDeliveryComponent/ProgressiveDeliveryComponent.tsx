@@ -2,8 +2,8 @@ import React, { useEffect, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
-import { configApiRef, useApi } from '@backstage/core-plugin-api';
-import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
+import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
+//import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -77,48 +77,61 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
   return edges;
 }
 
-
 export const TopologyComponent = () => {
-  const [topo, setTopo] = useState("{}");
+  const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
+
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
+  const fetchApi = useApi(fetchApiRef);
 
-  console.log("config:", config);
+  const querySaasPromotionsData = () => {
+    setIsLoading(true);
+    setError(false);
+    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/resources/json/saas-promotions.json`, {
+      method: 'GET',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+    }).then(response => {
+        if (!response.ok) {
+            throw new Error(`Network response was not ok ${response.statusText}`);
+        }
 
-  //if (topo === "{}") {
-      useQuerySaasPromotionsData()
-        .then((data) => {
-          setTopo(data)
-        });
-  //}
+        return response.text();
+    }).then(data => {
+        var rawData: SaasPromotionsData = JSON.parse(data);
+        setTopo(rawData);
+        setIsLoading(false)
+    }).catch((_error) => {
+        setError(true)
+        setIsLoading(false)
+    });
+  }
 
-  console.log("topo:", topo)
+  useEffect(() => {
+    querySaasPromotionsData();
+  }, [])
+
   const entity = useEntity().entity;
 
   const [nodes, setNodes] = useState<DependencyGraphTypes.DependencyNode[]>({});
   const [edges, setEdges] = useState<DependencyGraphTypes.DependencyEdge[]>({});
 
   const populateNodesEdges = () => {
-    if (topo === "{}") return;
-
     let name = entity.metadata.name.toLowerCase();
     if (entity.spec && entity.spec.system) {
       name = entity.spec.system.toString()
     }
-
-    console.log("name:", name)
-
-    console.log("inner topo:", topo)
 
     let rawEdges = topo.edges.filter(([f,t]) =>{
       const from = JSON.parse(f);
       const to = JSON.parse(t); 
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
-    console.log("rawEdges 1:", rawEdges)
 
     rawEdges = simplifyManyToMany(rawEdges);
-    console.log("rawEdges 2:", rawEdges)
 
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
@@ -134,10 +147,18 @@ export const TopologyComponent = () => {
     populateNodesEdges();
   }, [topo]);
      
-  if (!nodes && !edges) {
+  if (isLoading) {
     return (
       <InfoCard title="Progressive Delivery Topology">
         Processing ...
+      </InfoCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <InfoCard title="Progressive Delivery Topology">
+        There was an error
       </InfoCard>
     );
   }
