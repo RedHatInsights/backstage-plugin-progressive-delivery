@@ -1,9 +1,10 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useEffect, useRef, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
-//import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
+import Button from '@mui/material/Button';
+//import { NodeInfoComponent } from './NodeInfoComponent';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -78,6 +79,8 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 }
 
 export const TopologyComponent = () => {
+  const title: string = "Progressive Delivery Topology";
+
   const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -130,14 +133,18 @@ export const TopologyComponent = () => {
       const to = JSON.parse(t); 
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
+    console.log("rawEdges 1:", rawEdges);
 
     rawEdges = simplifyManyToMany(rawEdges);
+    console.log("rawEdges 2:", rawEdges)
 
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
       uniqueNodeSet.add(f);
       uniqueNodeSet.add(t);
     });
+
+    console.log("uniqueNodeSet:", uniqueNodeSet)
 
     setNodes(Array.from(uniqueNodeSet).map((n: string) => ({ id: n})))
     setEdges(rawEdges.map(([f,t]) => ({from: f, to: t})))
@@ -193,7 +200,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
       if (renderedHeight !== height || renderedWidth !== width) {
         setWidth(renderedWidth);
         setHeight(renderedHeight);
-      }
+      }      
     }
   }, [width, height]);
 
@@ -203,24 +210,26 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
 
   if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
     const classes = useStyles({ isTest: false });
-    return (<g>
-      <rect
-        className={classes.node}
-        width={paddedWidth}
-        height={paddedHeight}
-        rx={10}
-      />
-      <text
-        ref={idRef}
-        className={classes.text}
-        y={paddedHeight / 2}
-        x={paddedWidth / 2}
-        textAnchor="middle"
-        alignmentBaseline="middle"
-      >
-        {MANY_TO_MANY_NODE_LABEL}
-      </text>
-    </g>);
+    return (
+      <g>
+        <rect
+          className={classes.node}
+          width={paddedWidth}
+          height={paddedHeight}
+          rx={10}
+        />
+        <text
+          ref={idRef}
+          className={classes.text}
+          y={paddedHeight / 2}
+          x={paddedWidth / 2}
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          {MANY_TO_MANY_NODE_LABEL}
+        </text>
+      </g>
+    );
   }
 
   const node: Node = JSON.parse(id);
@@ -229,14 +238,15 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
   if (node.commit_sha) {
     sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
   }
-    var dep = "";
-    switch (node.deployment_state) {
-      case  "success":
-          dep = '✅'
-            break;
-      case "failed":
-          dep = '❌'
-            break;
+
+  var dep = "";
+  switch (node.deployment_state) {
+    case  "success":
+      dep = '✅'
+        break;
+    case "failed":
+      dep = '❌'
+        break;
   }
   const num_of_bolds: number = 1;
   let label: string[] = [
@@ -260,13 +270,39 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
 
   const classes = useStyles({ isTest: node.isTest });
 
+  const nodeRef = useRef();
+
+  const handleClickOpen = () => {
+    const node = nodeRef.current;
+
+    if (node) {
+      console.log("button clicked!");
+
+      // return (
+      //   <div>
+      //     <NodeInfoComponent isOpen={true} />
+      //   </div>
+      // )
+    }
+  }
+
+
+  //useEffect(() => {
+  //    const nodeElement = document.getElementById('node') | null;
+  //    nodeElement.addEventListener('click', () => {
+  //        console.log("button was clicked!")
+  //    })
+  //}, [tspans]);
+
   return (
-    <g>
+    <g id="node">
       <rect
         className={classes.node}
         width={paddedWidth}
         height={paddedHeight}
         rx={10}
+        ref={nodeRef}
+        onClick={handleClickOpen}
       />
       <text
         ref={idRef}
@@ -281,6 +317,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
     </g>
   );
 }
+
 
 const useStyles = makeStyles(
   theme => ({
