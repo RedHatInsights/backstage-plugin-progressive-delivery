@@ -3,8 +3,7 @@ import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
-import Button from '@mui/material/Button';
-//import { NodeInfoComponent } from './NodeInfoComponent';
+import { NodeInfoComponent } from './NodeInfoComponent';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -84,6 +83,7 @@ export const TopologyComponent = () => {
   const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
@@ -116,6 +116,17 @@ export const TopologyComponent = () => {
   useEffect(() => {
     querySaasPromotionsData();
   }, [])
+
+  useEffect(() => {
+    if (isPopupOpen) {
+      console.log("isPopupOpen:", isPopupOpen)
+      return (
+        <div>
+          <NodeInfoComponent />
+        </div>
+      )
+    }
+  }, [isPopupOpen])
 
   const entity = useEntity().entity;
 
@@ -181,6 +192,20 @@ export const TopologyComponent = () => {
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
       </InfoCard>
     );
+  }
+}
+
+const handleClickOpen = (nodeRef) => {
+  const node = nodeRef.current;
+
+  if (node) {
+    console.log("button clicked!");
+    setIsPopupOpen(true)
+    // return (
+    //   <div>
+    //     <NodeInfoComponent />
+    //   </div>
+    // )
   }
 }
 
@@ -270,22 +295,9 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
 
   const classes = useStyles({ isTest: node.isTest });
 
+  
+
   const nodeRef = useRef();
-
-  const handleClickOpen = () => {
-    const node = nodeRef.current;
-
-    if (node) {
-      console.log("button clicked!");
-
-      // return (
-      //   <div>
-      //     <NodeInfoComponent isOpen={true} />
-      //   </div>
-      // )
-    }
-  }
-
 
   //useEffect(() => {
   //    const nodeElement = document.getElementById('node') | null;
@@ -302,7 +314,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
         height={paddedHeight}
         rx={10}
         ref={nodeRef}
-        onClick={handleClickOpen}
+        onClick={() => handleClickOpen(nodeRef)}
       />
       <text
         ref={idRef}
@@ -313,7 +325,7 @@ function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodePro
         alignmentBaseline="middle"
       >
         {tspans}
-      </text>)
+      </text>
     </g>
   );
 }
