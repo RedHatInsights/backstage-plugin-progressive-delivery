@@ -1,21 +1,50 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import { withStyles } from '@material-ui/core/styles';
 import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import Typography from '@material-ui/core/Typography';
 
-export const NodeInfoComponent = ({ isPopupOpen, handleClose }: { isPopupOpen: boolean, handleClose: any }, ) => {
-  const [open, setOpen] = React.useState(true);
+const styles = (theme) => ({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
+    closeButton: {
+      position: 'absolute',
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+});
 
-//   const handleClose = () => {
-//     setIsPopupOpen(false);
-//   };
+const DialogTitle = withStyles(styles)((props) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </MuiDialogTitle>
+    );
+  });
+  
+  const DialogContent = withStyles((theme) => ({
+    root: {
+      padding: theme.spacing(2),
+    },
+  }))(MuiDialogContent);
 
-const handleCloseEvent = (event) => {
+export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { nodeData: any, isPopupOpen: boolean, handleClose: any }, ) => {
+  const handleCloseEvent = (event) => {
     handleClose(event.target.value)
-}
+  }
 
   const descriptionElementRef = React.useRef(null);
   React.useEffect(() => {
@@ -27,45 +56,39 @@ const handleCloseEvent = (event) => {
     }
   }, [isPopupOpen]);
 
+  const CheckIsTest = ({ isTest }: { isTest: boolean }) => {
+    if (!isTest) return;
+    
+    return <Typography>Job Type: TEST</Typography>
+  }
+
+  const DisplayNodeData = () => {
+    return (
+        <div>
+            <CheckIsTest isTest={nodeData?.isTest} />
+            <Typography>Commit Sha: {nodeData?.commit_sha || "N/A"}</Typography>
+            <Typography>Cluster: {nodeData?.cluster}</Typography>
+            <Typography>Namespace: {nodeData?.namespace}</Typography>
+            <Typography>Deployment State: {nodeData?.deployment_state}</Typography>
+            <Typography>Saas: {nodeData?.saas}</Typography>
+        </div>
+    )
+  }
+
   if (!isPopupOpen) {
     return null;
   }
 
   return (
     <div>
-      <Dialog
-        open={isPopupOpen}
-        onClose={handleCloseEvent}
-        // scroll={body}
-        aria-labelledby="scroll-dialog-title"
-        aria-describedby="scroll-dialog-description"
-      >
-        <DialogTitle id="scroll-dialog-title">Subscribe</DialogTitle>
-        {/* <DialogContent dividers={scroll === 'paper'}> */}
-          <DialogContentText
-            id="scroll-dialog-description"
-            ref={descriptionElementRef}
-            tabIndex={-1}
-          >
-            {[...new Array(2)]
-              .map(
-                () => `Cras mattis consectetur purus sit amet fermentum.
-Cras justo odio, dapibus ac facilisis in, egestas eget quam.
-Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-Praesent commodo cursus magna, vel scelerisque nisl consectetur et.`,
-              )
-              .join('\n')}
-          </DialogContentText>
-        {/* </DialogContent> */}
-        {/* <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleClose} color="primary">
-            Subscribe
-          </Button>
-        </DialogActions> */}
-      </Dialog>
+        <Dialog onClose={handleCloseEvent} aria-labelledby="customized-dialog-title" open={open}>
+            <DialogTitle id="customized-dialog-title" onClose={handleCloseEvent}>
+                {nodeData?.resourceTemplate}
+            </DialogTitle>
+            <DialogContent dividers>
+                <DisplayNodeData />
+            </DialogContent>
+        </Dialog>
     </div>
   );
 }

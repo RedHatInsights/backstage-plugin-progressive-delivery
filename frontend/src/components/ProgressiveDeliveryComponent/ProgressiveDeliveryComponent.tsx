@@ -120,10 +120,10 @@ export const TopologyComponent = () => {
 
   const [clickedNodeId, setClickedNodeId] = useState<string | undefined>(undefined);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [selectedNode, setSelectedNode] = useState<Entity | undefined>(undefined);
+  const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
 
-  const handleNodeClick = useCallback((node: Entity) => {
-    setClickedNodeId(node.metadata.uid);
+  const handleNodeClick = useCallback((nodeEntity: Entity, node: Node) => {
+    setClickedNodeId(nodeEntity.metadata.uid);
     setSelectedNode(node);
     setIsPopupOpen(true);
   }, []);
@@ -131,12 +131,6 @@ export const TopologyComponent = () => {
   const handleClose = () => {
     setIsPopupOpen(false);
   };
-
-  useEffect(() => {
-    if (isPopupOpen) {
-      console.log("isPopupOpen:", isPopupOpen)
-    }
-  }, [isPopupOpen])
 
   const entity = useEntity().entity;
 
@@ -154,10 +148,8 @@ export const TopologyComponent = () => {
       const to = JSON.parse(t); 
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
-    console.log("rawEdges 1:", rawEdges);
 
     rawEdges = simplifyManyToMany(rawEdges);
-    console.log("rawEdges 2:", rawEdges)
 
     const uniqueNodeSet = new Set<string>();
     rawEdges.forEach(([f, t]) => {
@@ -165,15 +157,11 @@ export const TopologyComponent = () => {
       uniqueNodeSet.add(t);
     });
 
-    console.log("uniqueNodeSet:", uniqueNodeSet)
-
     setNodes(Array.from(uniqueNodeSet).map((n: string) => ({ id: n})))
     setEdges(rawEdges.map(([f,t]) => ({from: f, to: t})))
   }
 
   const CustomNodeRenderer = useCallback(({ node: { id } }: DependencyGraphTypes.RenderNodeProps) => {
-    const isClicked = id === clickedNodeId;
-    console.log("clicked node:", isClicked)
     const [width, setWidth] = React.useState(0);
     const [height, setHeight] = React.useState(0);
     const idRef = React.useRef<SVGTextElement | null>(null);
@@ -268,7 +256,7 @@ export const TopologyComponent = () => {
           height={paddedHeight}
           rx={10}
           ref={nodeRef}
-          onClick={() => handleNodeClick(entity)}
+          onClick={() => handleNodeClick(entity, node)}
         />
         <text
           ref={idRef}
@@ -309,7 +297,7 @@ export const TopologyComponent = () => {
   if (nodes.length !== 0 && edges.length !== 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
-        <NodeInfoComponent isPopupOpen={isPopupOpen} handleClose={handleClose} />
+        <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
 
         <DependencyGraph
           nodes={nodes}
@@ -325,14 +313,7 @@ export const TopologyComponent = () => {
 const useStyles = makeStyles(
   theme => ({
     node: {
-      fill: (props) => {
-        let isTest = extractBool(props)
-        if (isTest) {
-            return '#FFF3D1';
-        } else {
-            return '#DCE8FA';
-        }
-      },
+      fill: '#DCE8FA',
       stroke: (props) => {
           let isTest = extractBool(props)
           if (isTest) {
