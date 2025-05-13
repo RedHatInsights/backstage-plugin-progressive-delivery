@@ -1,9 +1,11 @@
-import React, { useEffect, useState }  from 'react';
+import React, { useCallback, useEffect, useRef, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
 import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
-//import { useQuerySaasPromotionsData } from '../../common/querySaasPromotionsData';
+import { NodeInfoComponent } from './NodeInfoComponent';
+
+import { Entity } from '@backstage/catalog-model';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
 
@@ -78,6 +80,8 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 }
 
 export const TopologyComponent = () => {
+  const title: string = "Progressive Delivery Topology";
+
   const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -89,7 +93,7 @@ export const TopologyComponent = () => {
   const querySaasPromotionsData = () => {
     setIsLoading(true);
     setError(false);
-    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/resources/json/saas-promotions.json`, {
+    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/resources/configmap/saas-promotions/saas-promotions.json`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json'
@@ -113,6 +117,20 @@ export const TopologyComponent = () => {
   useEffect(() => {
     querySaasPromotionsData();
   }, [])
+
+  const [clickedNodeId, setClickedNodeId] = useState<string | undefined>(undefined);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
+
+  const handleNodeClick = useCallback((nodeEntity: Entity, node: Node) => {
+    setClickedNodeId(nodeEntity.metadata.uid);
+    setSelectedNode(node);
+    setIsPopupOpen(true);
+  }, []);
+
+  const handleClose = () => {
+    setIsPopupOpen(false);
+  };
 
   const entity = useEntity().entity;
 
@@ -143,6 +161,119 @@ export const TopologyComponent = () => {
     setEdges(rawEdges.map(([f,t]) => ({from: f, to: t})))
   }
 
+  const CustomNodeRenderer = useCallback(({ node: { id } }: DependencyGraphTypes.RenderNodeProps) => {
+    const [width, setWidth] = React.useState(0);
+    const [height, setHeight] = React.useState(0);
+    const idRef = React.useRef<SVGTextElement | null>(null);
+
+    React.useLayoutEffect(() => {
+      // set the width to the length of the ID
+      if (idRef.current) {
+        let { height: renderedHeight, width: renderedWidth } =
+          idRef.current.getBBox();
+        renderedHeight = Math.round(renderedHeight);
+        renderedWidth = Math.round(renderedWidth);
+
+        if (renderedHeight !== height || renderedWidth !== width) {
+          setWidth(renderedWidth);
+          setHeight(renderedHeight);
+        }      
+      }
+    }, [width, height]);
+
+    const padding = 10;
+    const paddedWidth = width + padding * 2;
+    const paddedHeight = height + padding * 2;
+
+    if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
+      const classes = useStyles({ isTest: false });
+      return (
+        <g>
+          <rect
+            className={classes.node}
+            width={paddedWidth}
+            height={paddedHeight}
+            rx={10}
+          />
+          <text
+            ref={idRef}
+            className={classes.text}
+            y={paddedHeight / 2}
+            x={paddedWidth / 2}
+            textAnchor="middle"
+            alignmentBaseline="middle"
+          >
+            {MANY_TO_MANY_NODE_LABEL}
+          </text>
+        </g>
+      );
+    }
+
+    const node: Node = JSON.parse(id);
+
+    let sha: string = "none";
+    if (node.commit_sha) {
+      sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
+    }
+
+    var dep = "";
+    switch (node.deployment_state) {
+      case  "success":
+        dep = '✅'
+          break;
+      case "failed":
+        dep = '❌'
+          break;
+    }
+    const num_of_bolds: number = 1;
+    let label: string[] = [
+      `${node.resourceTemplate}/${node.target}`,
+      `on ${node.cluster}/${node.namespace} (${node.saas})`,
+      `${sha} ${dep}`,
+    ];
+    let tspans = label.map((l, i) => {
+      return (
+        <tspan
+          x={paddedWidth / 2}
+
+          // We can't use paddedHeight because we'll recalculate the height while
+          // adding to the height, which causes an infinite loop.
+          y={(i+1) * 2 * padding}
+          fontWeight={i < num_of_bolds ? "bold" : "normal"}
+        >
+          {l}
+        </tspan>);
+    });
+
+    const classes = useStyles({ isTest: node.isTest });
+    const nodeRef = useRef();
+
+    return (
+      <g id="node">
+        <rect
+          className={classes.node}
+          width={paddedWidth}
+          height={paddedHeight}
+          rx={10}
+          ref={nodeRef}
+          onClick={() => handleNodeClick(entity, node)}
+        />
+        <text
+          ref={idRef}
+          className={classes.text}
+          y={paddedHeight / 2}
+          x={paddedWidth * 2}
+          textAnchor="middle"
+          alignmentBaseline="middle"
+        >
+          {tspans}
+        </text>
+      </g>
+    );
+  }, [clickedNodeId, handleNodeClick],)
+  
+
+
   useEffect(() => {
     populateNodesEdges();
   }, [topo]);
@@ -166,6 +297,8 @@ export const TopologyComponent = () => {
   if (nodes.length !== 0 && edges.length !== 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
+        <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
+
         <DependencyGraph
           nodes={nodes}
           edges={edges}
@@ -177,122 +310,10 @@ export const TopologyComponent = () => {
   }
 }
 
-function CustomNodeRenderer({ node: { id } }: DependencyGraphTypes.RenderNodeProps) {
-  const [width, setWidth] = React.useState(0);
-  const [height, setHeight] = React.useState(0);
-  const idRef = React.useRef<SVGTextElement | null>(null);
-
-  React.useLayoutEffect(() => {
-    // set the width to the length of the ID
-    if (idRef.current) {
-      let { height: renderedHeight, width: renderedWidth } =
-        idRef.current.getBBox();
-      renderedHeight = Math.round(renderedHeight);
-      renderedWidth = Math.round(renderedWidth);
-
-      if (renderedHeight !== height || renderedWidth !== width) {
-        setWidth(renderedWidth);
-        setHeight(renderedHeight);
-      }
-    }
-  }, [width, height]);
-
-  const padding = 10;
-  const paddedWidth = width + padding * 2;
-  const paddedHeight = height + padding * 2;
-
-  if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
-    const classes = useStyles({ isTest: false });
-    return (<g>
-      <rect
-        className={classes.node}
-        width={paddedWidth}
-        height={paddedHeight}
-        rx={10}
-      />
-      <text
-        ref={idRef}
-        className={classes.text}
-        y={paddedHeight / 2}
-        x={paddedWidth / 2}
-        textAnchor="middle"
-        alignmentBaseline="middle"
-      >
-        {MANY_TO_MANY_NODE_LABEL}
-      </text>
-    </g>);
-  }
-
-  const node: Node = JSON.parse(id);
-
-  let sha: string = "none";
-  if (node.commit_sha) {
-    sha = node.commit_sha.length >= 32? node.commit_sha?.substring(0,7) : node.commit_sha!;
-  }
-    var dep = "";
-    switch (node.deployment_state) {
-      case  "success":
-          dep = '✅'
-            break;
-      case "failed":
-          dep = '❌'
-            break;
-  }
-  const num_of_bolds: number = 1;
-  let label: string[] = [
-    `${node.resourceTemplate}/${node.target}`,
-    `on ${node.cluster}/${node.namespace} (${node.saas})`,
-    `${sha} ${dep}`,
-  ];
-  let tspans = label.map((l, i) => {
-    return (
-      <tspan
-        x={paddedWidth / 2}
-
-        // We can't use paddedHeight because we'll recalculate the height while
-        // adding to the height, which causes an infinite loop.
-        y={(i+1) * 2 * padding}
-        fontWeight={i < num_of_bolds ? "bold" : "normal"}
-      >
-        {l}
-      </tspan>);
-  });
-
-  const classes = useStyles({ isTest: node.isTest });
-
-  return (
-    <g>
-      <rect
-        className={classes.node}
-        width={paddedWidth}
-        height={paddedHeight}
-        rx={10}
-      />
-      <text
-        ref={idRef}
-        className={classes.text}
-        y={paddedHeight / 2}
-        x={paddedWidth * 2}
-        textAnchor="middle"
-        alignmentBaseline="middle"
-      >
-        {tspans}
-      </text>)
-    </g>
-  );
-}
-
 const useStyles = makeStyles(
   theme => ({
     node: {
-      fill: (props) => {
-        let isTest = extractBool(props)
-        if (isTest) {
-            return '#FFF3D1';
-        } else {
-            return '#DCE8FA';
-        }
-      },
+      fill: '#DCE8FA',
       stroke: (props) => {
           let isTest = extractBool(props)
           if (isTest) {
