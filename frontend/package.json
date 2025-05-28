@@ -1,6 +1,6 @@
 {
   "name": "@backstage-plugin-progressive-delivery/backstage-plugin-progressive-delivery-frontend",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "license": "Apache-2.0",
@@ -40,6 +40,7 @@
     "@material-ui/lab": "^4.0.0-alpha.61",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
+    "@patternfly/react-log-viewer": "^6.2.0",
     "react": "^18.3.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.1",
@@ -56,6 +57,7 @@
     "@backstage/test-utils": "^1.5.5",
     "@janus-idp/cli": "^3.5.0",
     "@jest/globals": "^29.7.0",
+    "@patternfly/react-core": "^6.2.2",
     "@testing-library/jest-dom": "6.0.0",
     "@testing-library/react": "14.0.0",
     "@testing-library/user-event": "14.0.0",

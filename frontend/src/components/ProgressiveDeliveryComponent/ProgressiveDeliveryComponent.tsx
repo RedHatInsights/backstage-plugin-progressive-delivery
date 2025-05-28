@@ -89,6 +89,9 @@ export const TopologyComponent = () => {
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
   const fetchApi = useApi(fetchApiRef);
+  const grafanaLink = config.getString('progressive-delivery.grafanaLink')
+  console.log("config:", config)
+  console.log("grafanaLink:", grafanaLink);
 
   const querySaasPromotionsData = () => {
     setIsLoading(true);
@@ -121,6 +124,15 @@ export const TopologyComponent = () => {
   const [clickedNodeId, setClickedNodeId] = useState<string | undefined>(undefined);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
+  const [isHover, setIsHover] = useState(false);
+
+  const handleNodeMouseHover = () => {
+      setIsHover(true);
+  }
+
+  const handleMouseLeave = () => {
+      setIsHover(false);
+  }
 
   const handleNodeClick = useCallback((nodeEntity: Entity, node: Node) => {
     setClickedNodeId(nodeEntity.metadata.uid);
@@ -186,7 +198,7 @@ export const TopologyComponent = () => {
     const paddedHeight = height + padding * 2;
 
     if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
-      const classes = useStyles({ isTest: false });
+      const classes = useStyles(node.deployment_state);
       return (
         <g>
           <rect
@@ -245,7 +257,7 @@ export const TopologyComponent = () => {
         </tspan>);
     });
 
-    const classes = useStyles({ isTest: node.isTest });
+    const classes = useStyles({ deployment_state: node.deployment_state });
     const nodeRef = useRef();
 
     return (
@@ -296,8 +308,8 @@ export const TopologyComponent = () => {
 
   if (nodes.length !== 0 && edges.length !== 0) {
     return (
+      <div>
       <InfoCard title="Progressive Delivery Topology">
-        <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
 
         <DependencyGraph
           nodes={nodes}
@@ -306,6 +318,8 @@ export const TopologyComponent = () => {
           renderNode={CustomNodeRenderer}
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
       </InfoCard>
+      <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
+      </div>
     );
   }
 }
@@ -314,12 +328,18 @@ const useStyles = makeStyles(
   theme => ({
     node: {
       fill: '#DCE8FA',
-      stroke: (props) => {
-          let isTest = extractBool(props)
-          if (isTest) {
-              return '#FFE59E';
+      fill: (props) => {
+          if (props.deployment_state === "failed") {
+              return '#C41E3A';
           } else {
-              return '#9BB3D6';
+              return '#DCE8FA';
+          }
+      },
+      stroke: (props) => {
+          if (props.deployment_state === "failed") {
+              return '#C41E3A';
+          } else {
+              return '#DCE8FA';
           }
       },
     },
@@ -342,8 +362,8 @@ const useStyles = makeStyles(
   { name: 'BackstageDependencyGraphDefaultNode' },
 );
 
-function extractBool(props: { isTest?: boolean; }) {
-    if (props.isTest) {
+function extractBool(props: { deployment_state?: boolean; }) {
+    if (props.deployment_state) {
         return true;
     } else {
         return false;
