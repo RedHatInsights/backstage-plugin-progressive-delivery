@@ -186,7 +186,7 @@ export const TopologyComponent = () => {
     const paddedHeight = height + padding * 2;
 
     if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
-      const classes = useStyles({ isTest: false });
+      const classes = useStyles(node.deployment_state);
       return (
         <g>
           <rect
@@ -245,7 +245,7 @@ export const TopologyComponent = () => {
         </tspan>);
     });
 
-    const classes = useStyles({ isTest: node.isTest });
+    const classes = useStyles({ deployment_state: node.deployment_state });
     const nodeRef = useRef();
 
     return (
@@ -298,7 +298,6 @@ export const TopologyComponent = () => {
     return (
       <InfoCard title="Progressive Delivery Topology">
         <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
-
         <DependencyGraph
           nodes={nodes}
           edges={edges}
@@ -310,18 +309,17 @@ export const TopologyComponent = () => {
   }
 }
 
+const isFailed = (props: any) => {
+  if (props.deployment_state === "failed") return '#C41E3A';
+
+  return '#DCE8FA';
+}
+
 const useStyles = makeStyles(
   theme => ({
     node: {
-      fill: '#DCE8FA',
-      stroke: (props) => {
-          let isTest = extractBool(props)
-          if (isTest) {
-              return '#FFE59E';
-          } else {
-              return '#9BB3D6';
-          }
-      },
+      fill: (props) => { return isFailed(props) },
+      stroke: (props) => { return isFailed(props) },
     },
     edge: {
       strokeWidth: 2,
@@ -342,8 +340,8 @@ const useStyles = makeStyles(
   { name: 'BackstageDependencyGraphDefaultNode' },
 );
 
-function extractBool(props: { isTest?: boolean; }) {
-    if (props.isTest) {
+function extractBool(props: { deployment_state?: boolean; }) {
+    if (props.deployment_state) {
         return true;
     } else {
         return false;
