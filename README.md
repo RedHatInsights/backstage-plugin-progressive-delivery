@@ -21,7 +21,7 @@ how far along a given deployment is.
 
 Run the following script to build/package the plugin
 ```
-./frontend/build
+cd frontend && ./build
 ```
 
 A `tgz` will be created in the `frontend` directory of the repo.
