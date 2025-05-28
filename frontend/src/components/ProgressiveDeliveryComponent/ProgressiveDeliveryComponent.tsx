@@ -309,17 +309,23 @@ export const TopologyComponent = () => {
   }
 }
 
-const isFailed = (props: any) => {
+const getNodeColorFromState = (props: any) => {
   if (props.deployment_state === "failed") return '#C41E3A';
 
   return '#DCE8FA';
 }
 
+const DEFAULT_COLOR = "#DCE8FA";
+
+const colors = {
+  failed: "#C41E3A",
+};
+
 const useStyles = makeStyles(
   theme => ({
     node: {
-      fill: (props) => { return isFailed(props) },
-      stroke: (props) => { return isFailed(props) },
+      fill: (props) => colors[props.deployment_state] || DEFAULT_COLOR,
+      stroke: (props) => colors[props.deployment_state] || DEFAULT_COLOR
     },
     edge: {
       strokeWidth: 2,
@@ -340,10 +346,3 @@ const useStyles = makeStyles(
   { name: 'BackstageDependencyGraphDefaultNode' },
 );
 
-function extractBool(props: { deployment_state?: boolean; }) {
-    if (props.deployment_state) {
-        return true;
-    } else {
-        return false;
-    }
-}
