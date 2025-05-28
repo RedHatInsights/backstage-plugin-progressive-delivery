@@ -124,15 +124,6 @@ export const TopologyComponent = () => {
   const [clickedNodeId, setClickedNodeId] = useState<string | undefined>(undefined);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
-  const [isHover, setIsHover] = useState(false);
-
-  const handleNodeMouseHover = () => {
-      setIsHover(true);
-  }
-
-  const handleMouseLeave = () => {
-      setIsHover(false);
-  }
 
   const handleNodeClick = useCallback((nodeEntity: Entity, node: Node) => {
     setClickedNodeId(nodeEntity.metadata.uid);
@@ -310,7 +301,6 @@ export const TopologyComponent = () => {
     return (
       <div>
       <InfoCard title="Progressive Delivery Topology">
-
         <DependencyGraph
           nodes={nodes}
           edges={edges}
