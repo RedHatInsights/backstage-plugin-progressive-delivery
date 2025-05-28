@@ -296,8 +296,8 @@ export const TopologyComponent = () => {
 
   if (nodes.length !== 0 && edges.length !== 0) {
     return (
-      <div>
       <InfoCard title="Progressive Delivery Topology">
+        <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
         <DependencyGraph
           nodes={nodes}
           edges={edges}
@@ -305,8 +305,6 @@ export const TopologyComponent = () => {
           renderNode={CustomNodeRenderer}
           direction={DependencyGraphTypes.Direction.LEFT_RIGHT}/>
       </InfoCard>
-      <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
-      </div>
     );
   }
 }
