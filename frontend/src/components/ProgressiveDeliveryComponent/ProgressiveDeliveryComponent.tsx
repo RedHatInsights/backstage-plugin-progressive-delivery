@@ -89,9 +89,6 @@ export const TopologyComponent = () => {
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
   const fetchApi = useApi(fetchApiRef);
-  const grafanaLink = config.getString('progressive-delivery.grafanaLink')
-  console.log("config:", config)
-  console.log("grafanaLink:", grafanaLink);
 
   const querySaasPromotionsData = () => {
     setIsLoading(true);
@@ -314,24 +311,17 @@ export const TopologyComponent = () => {
   }
 }
 
+const isFailed = (props: any) => {
+  if (props.deployment_state === "failed") return '#C41E3A';
+
+  return '#DCE8FA';
+}
+
 const useStyles = makeStyles(
   theme => ({
     node: {
-      fill: '#DCE8FA',
-      fill: (props) => {
-          if (props.deployment_state === "failed") {
-              return '#C41E3A';
-          } else {
-              return '#DCE8FA';
-          }
-      },
-      stroke: (props) => {
-          if (props.deployment_state === "failed") {
-              return '#C41E3A';
-          } else {
-              return '#DCE8FA';
-          }
-      },
+      fill: (props) => { return isFailed(props) },
+      stroke: (props) => { return isFailed(props) },
     },
     edge: {
       strokeWidth: 2,
