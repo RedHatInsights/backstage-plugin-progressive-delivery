@@ -1,7 +1,0 @@
-rm -rf dist*
-yarn export-dynamic
-cd dist-dynamic
-npm pack
-mv *.tgz ..
-cd ..
-shasum -a 256 *.tgz | awk '{print $1}' | xxd -r -p | base64
