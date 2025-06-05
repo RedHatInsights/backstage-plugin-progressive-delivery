@@ -186,7 +186,7 @@ export const TopologyComponent = () => {
     const paddedHeight = height + padding * 2;
 
     if (id.match(new RegExp(`^${MANY_TO_MANY_NODE_LABEL}-\\d+$`))) {
-      const classes = useStyles(node.deployment_state);
+      const classes = useStyles();
       return (
         <g>
           <rect
