@@ -1,5 +1,6 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
@@ -41,6 +42,11 @@ const DialogTitle = withStyles(styles)((props) => {
   }))(MuiDialogContent);
 
 export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { nodeData: any, isPopupOpen: boolean, handleClose: any }, ) => {
+  const config = useApi(configApiRef);
+  console.log("config", config)
+  const grafanaUrl = config.getString('grafana.dashboardLink');
+  console.log("grafanaUrl:", grafanaUrl);
+
   const handleCloseEvent = (event) => {
     handleClose(event.target.value)
   }
