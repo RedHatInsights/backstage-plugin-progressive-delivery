@@ -90,6 +90,11 @@ export const TopologyComponent = () => {
   const baseUrl = config.getString('backend.baseUrl');
   const fetchApi = useApi(fetchApiRef);
 
+
+  console.log("config", config)
+  const grafanaUrl = config.getString('grafana.dashboardUrl');
+  console.log("grafanaUrl:", grafanaUrl);
+
   const querySaasPromotionsData = () => {
     setIsLoading(true);
     setError(false);
