@@ -1,16 +1,22 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
+import { createStyles, makeStyles, withStyles } from '@material-ui/core/styles';
+import { useApi, configApiRef } from '@backstage/core-plugin-api';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import Box from '@material-ui/core/Box';
 
 const styles = (theme) => ({
     root: {
       margin: 0,
       padding: theme.spacing(2),
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
     },
     closeButton: {
       position: 'absolute',
@@ -19,6 +25,19 @@ const styles = (theme) => ({
       color: theme.palette.grey[500],
     },
 });
+
+// Grid styling
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      marginTop: "10px",
+      flexGrow: 1,
+    },
+    button: {
+      justifyContent: 'center'
+    },
+  }),
+);
 
 const DialogTitle = withStyles(styles)((props) => {
     const { children, classes, onClose, ...other } = props;
@@ -41,6 +60,13 @@ const DialogTitle = withStyles(styles)((props) => {
   }))(MuiDialogContent);
 
 export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { nodeData: any, isPopupOpen: boolean, handleClose: any }, ) => {
+  const classes = useStyles();
+
+  const config = useApi(configApiRef);
+  console.log("config", config)
+  const grafanaUrl = config.getString('grafana.dashboardUrl');
+  console.log("grafanaUrl:", grafanaUrl);
+
   const handleCloseEvent = (event) => {
     handleClose(event.target.value)
   }
@@ -63,13 +89,17 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
 
   const DisplayNodeData = () => {
     return (
-        <div>
-            <CheckIsTest isTest={nodeData?.isTest} />
-            <Typography>Commit Sha: {nodeData?.commit_sha || "N/A"}</Typography>
-            <Typography>Cluster: {nodeData?.cluster}</Typography>
-            <Typography>Namespace: {nodeData?.namespace}</Typography>
-            <Typography>Deployment State: {nodeData?.deployment_state}</Typography>
-            <Typography>Saas: {nodeData?.saas}</Typography>
+        <div className={classes.root}>
+          <CheckIsTest isTest={nodeData?.isTest} />
+          <Typography>Commit Sha: {nodeData?.commit_sha || "N/A"}</Typography>
+          <Typography>Cluster: {nodeData?.cluster}</Typography>
+          <Typography>Namespace: {nodeData?.namespace}</Typography>
+          <Typography>Deployment State: {nodeData?.deployment_state}</Typography>
+          <Typography>Saas: {nodeData?.saas}</Typography>
+
+          <Box textAlign='center'>
+            <Button href={grafanaUrl} variant="contained" target="_blank">Logs</Button>
+          </Box>
         </div>
     )
   }
