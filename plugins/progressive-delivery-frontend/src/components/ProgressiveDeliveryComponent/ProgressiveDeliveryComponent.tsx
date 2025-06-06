@@ -265,6 +265,7 @@ export const TopologyComponent = () => {
           x={paddedWidth * 2}
           textAnchor="middle"
           alignmentBaseline="middle"
+          onClick={() => handleNodeClick(entity, node)}
         >
           {tspans}
         </text>
