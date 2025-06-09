@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, StylesProvider } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
 import { NodeInfoComponent } from './NodeInfoComponent';
-
+import Tooltip from '@material-ui/core/Tooltip';
 import { Entity } from '@backstage/catalog-model';
 
 const MANY_TO_MANY_NODE_LABEL = "soak";
@@ -326,11 +326,16 @@ const useStyles = makeStyles(
   theme => ({
     node: {
       fill: (props) => colors[props.deployment_state] || DEFAULT_COLOR,
-      stroke: (props) => colors[props.deployment_state] || DEFAULT_COLOR
+      stroke: (props) => colors[props.deployment_state] || DEFAULT_COLOR,
+      '&:hover': {
+        fill: (props) => '#79a0d9',
+        stroke: (props) => '#79a0d9',
+      },
     },
     edge: {
       strokeWidth: 2,
     },
+
     path: {
       strokeWidth: 2,
     },
