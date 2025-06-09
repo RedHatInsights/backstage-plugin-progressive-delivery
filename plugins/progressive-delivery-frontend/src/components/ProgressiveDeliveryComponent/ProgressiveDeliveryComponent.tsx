@@ -295,7 +295,7 @@ export const TopologyComponent = () => {
     );
   }
 
-  if (nodes.length !== 0 && edges.length !== 0) {
+  if (nodes.length > 0 && edges.length > 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
         <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
