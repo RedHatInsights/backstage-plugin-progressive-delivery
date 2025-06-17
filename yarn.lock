@@ -10929,7 +10929,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@redhatinsights/backstage-plugin-progressive-delivery-frontend@npm:^0.3.1, @redhatinsights/backstage-plugin-progressive-delivery-frontend@workspace:plugins/progressive-delivery-frontend":
+"@redhatinsights/backstage-plugin-progressive-delivery-frontend@npm:^0.4.0, @redhatinsights/backstage-plugin-progressive-delivery-frontend@workspace:plugins/progressive-delivery-frontend":
   version: 0.0.0-use.local
   resolution: "@redhatinsights/backstage-plugin-progressive-delivery-frontend@workspace:plugins/progressive-delivery-frontend"
   dependencies:
@@ -15574,7 +15574,7 @@ __metadata:
     "@material-ui/core": "npm:^4.12.2"
     "@material-ui/icons": "npm:^4.9.1"
     "@playwright/test": "npm:^1.32.3"
-    "@redhatinsights/backstage-plugin-progressive-delivery-frontend": "npm:^0.3.1"
+    "@redhatinsights/backstage-plugin-progressive-delivery-frontend": "npm:^0.4.0"
     "@testing-library/dom": "npm:^9.0.0"
     "@testing-library/jest-dom": "npm:^6.0.0"
     "@testing-library/react": "npm:^14.0.0"
