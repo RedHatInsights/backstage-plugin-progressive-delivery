@@ -304,7 +304,7 @@ export const TopologyComponent = () => {
   if (nodes.length > 0 && edges.length > 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
-        <Alert severity="info">Click the nodes for more information on the job run</Alert>
+        <Alert severity="info">Click the nodes for more information on each job run</Alert>
         <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
         <DependencyGraph
           nodes={nodes}
