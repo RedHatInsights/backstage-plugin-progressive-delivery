@@ -126,6 +126,7 @@ export const TopologyComponent = () => {
   const [clickedNodeId, setClickedNodeId] = useState<string | undefined>(undefined);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState<Node | undefined>(undefined);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleNodeClick = useCallback((nodeEntity: Entity, node: Node) => {
     setClickedNodeId(nodeEntity.metadata.uid);
@@ -135,6 +136,16 @@ export const TopologyComponent = () => {
 
   const handleClose = () => {
     setIsPopupOpen(false);
+  };
+
+  const handleMouseEnter = useCallback((nodeEntity: Entity, node: Node) => {
+    setClickedNodeId(nodeEntity.metadata.uid);
+    setSelectedNode(node);
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
   };
 
   const entity = useEntity().entity;
@@ -254,6 +265,7 @@ export const TopologyComponent = () => {
     const nodeRef = useRef();
 
     return (
+      <div onMouseEnter={() => handleMouseEnter()} onMouseLeave={() => handleMouseLeave()}>
       <g id="node">
         <rect
           className={classes.node}
@@ -262,6 +274,7 @@ export const TopologyComponent = () => {
           rx={10}
           ref={nodeRef}
           onClick={() => handleNodeClick(entity, node)}
+          
         />
         <text
           ref={idRef}
@@ -275,6 +288,7 @@ export const TopologyComponent = () => {
           {tspans}
         </text>
       </g>
+      </div>
     );
   }, [clickedNodeId, handleNodeClick],)
   
@@ -303,7 +317,7 @@ export const TopologyComponent = () => {
   if (nodes.length > 0 && edges.length > 0) {
     return (
       <InfoCard title="Progressive Delivery Topology">
-        <NodeInfoComponent nodeData={selectedNode} isPopupOpen={isPopupOpen} handleClose={handleClose} />
+        <NodeInfoComponent nodeData={selectedNode} isHovered={isHovered} handleMouseLeave={handleMouseLeave} isPopupOpen={isPopupOpen} handleClose={handleClose} />
         <DependencyGraph
           nodes={nodes}
           edges={edges}

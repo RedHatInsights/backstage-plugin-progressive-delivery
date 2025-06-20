@@ -59,7 +59,7 @@ const DialogTitle = withStyles(styles)((props) => {
     },
   }))(MuiDialogContent);
 
-export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { nodeData: any, isPopupOpen: boolean, handleClose: any }, ) => {
+export const NodeInfoComponent = ({ nodeData, isHovered, handleMouseLeave, isPopupOpen, handleClose }: { nodeData: any, isHovered: boolean, handleMouseLeave: any, isPopupOpen: boolean, handleClose: any }, ) => {
   const classes = useStyles();
 
   const config = useApi(configApiRef);
@@ -68,18 +68,19 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
   console.log("grafanaUrl:", grafanaUrl);
 
   const handleCloseEvent = (event) => {
-    handleClose(event.target.value)
+    //handleClose(event.target.value)
+    handleMouseLeave(event.target.value)
   }
 
   const descriptionElementRef = React.useRef(null);
   React.useEffect(() => {
-    if (isPopupOpen) {
+    if (isHovered) {
       const { current: descriptionElement } = descriptionElementRef;
       if (descriptionElement !== null) {
         descriptionElement.focus();
       }
     }
-  }, [isPopupOpen]);
+  }, [isHovered]);
 
   const CheckIsTest = ({ isTest }: { isTest: boolean }) => {
     if (!isTest) return;
@@ -104,14 +105,14 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
     )
   }
 
-  if (!isPopupOpen) {
+  if (!isHovered) {
     return null;
   }
 
   return (
     <div>
-        <Dialog onClose={handleCloseEvent} aria-labelledby="customized-dialog-title" open={open}>
-            <DialogTitle id="customized-dialog-title" onClose={handleCloseEvent}>
+        <Dialog onClose={handleMouseLeave} aria-labelledby="customized-dialog-title" open={open}>
+            <DialogTitle id="customized-dialog-title" onClose={handleMouseLeave}>
                 {nodeData?.resourceTemplate}
             </DialogTitle>
             <DialogContent dividers>
