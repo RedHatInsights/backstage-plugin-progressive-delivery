@@ -95,8 +95,7 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
           <Typography>Cluster: {nodeData?.cluster}</Typography>
           <Typography>Namespace: {nodeData?.namespace}</Typography>
           <Typography>Deployment State: {nodeData?.deployment_state}</Typography>
-          <Typography>Saas: {nodeData?.saas}</Typography>
- 
+          <Typography>Saas: {nodeData?.saas}</Typography> 
           {/* <Box textAlign='center'>
             <Button href={grafanaUrl} variant="contained" target="_blank">Logs</Button>
           </Box> */}
