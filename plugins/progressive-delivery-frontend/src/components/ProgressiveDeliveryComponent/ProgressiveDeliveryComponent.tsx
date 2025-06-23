@@ -99,7 +99,7 @@ export const TopologyComponent = () => {
   const querySaasPromotionsData = () => {
     setIsLoading(true);
     setError(false);
-    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/server/saas-promotions`, {
+    fetchApi.fetch(`${baseUrl}/api/proxy/inscope-resources/saas-promotions`, {
       method: 'GET',
       headers: {
           'Content-Type': 'application/json'
