@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { makeStyles, StylesProvider } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
 import { NodeInfoComponent } from './NodeInfoComponent';
-import Tooltip from '@material-ui/core/Tooltip';
 import { Entity } from '@backstage/catalog-model';
 import Alert from '@material-ui/lab/Alert';
 
@@ -315,12 +314,6 @@ export const TopologyComponent = () => {
       </InfoCard>
     );
   }
-}
-
-const getNodeColorFromState = (props: any) => {
-  if (props.deployment_state === "failed") return '#C41E3A';
-
-  return '#DCE8FA';
 }
 
 const DEFAULT_COLOR = "#DCE8FA";
