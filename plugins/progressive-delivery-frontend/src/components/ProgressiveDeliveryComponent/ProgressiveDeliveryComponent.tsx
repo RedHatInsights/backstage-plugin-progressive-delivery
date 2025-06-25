@@ -89,11 +89,6 @@ export const TopologyComponent = () => {
   const baseUrl = config.getString('backend.baseUrl');
   const fetchApi = useApi(fetchApiRef);
 
-
-  console.log("config", config)
-  const grafanaUrl = config.getString('grafana.dashboardUrl');
-  console.log("grafanaUrl:", grafanaUrl);
-
   const querySaasPromotionsData = () => {
     setIsLoading(true);
     setError(false);
@@ -110,7 +105,6 @@ export const TopologyComponent = () => {
         return response.text();
     }).then(data => {
         var rawData: SaasPromotionsData = JSON.parse(data);
-        console.log(rawData)
         setTopo(rawData);
         setIsLoading(false)
     }).catch((_error) => {

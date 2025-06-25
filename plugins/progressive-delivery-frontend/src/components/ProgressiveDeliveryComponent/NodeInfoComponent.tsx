@@ -65,8 +65,6 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
   const config = useApi(configApiRef);
   const grafanaUrl = config.getString('grafana.dashboardUrl');
 
-  console.log("nodeData:", nodeData)
-
   const handleCloseEvent = (event) => {
     handleClose(event.target.value)
   }
@@ -89,8 +87,6 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
 
   const createLogsLink = (grafanaUrl: string, appName: string, cluster: string, targetRef: string, saasFilename: string) => {
       let identifier: string = "";
-
-      console.log("cluster:", cluster)
 
       if (cluster.substring(0,5) === "hivei") identifier = "integration";
       else if (cluster.substring(0,5) === "hives") identifier = "stage";
