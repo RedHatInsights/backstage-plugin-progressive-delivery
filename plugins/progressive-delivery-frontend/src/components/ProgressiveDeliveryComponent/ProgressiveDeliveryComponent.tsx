@@ -81,8 +81,6 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 }
 
 export const TopologyComponent = () => {
-  const title: string = "Progressive Delivery Topology";
-
   const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -90,11 +88,6 @@ export const TopologyComponent = () => {
   const config = useApi(configApiRef);
   const baseUrl = config.getString('backend.baseUrl');
   const fetchApi = useApi(fetchApiRef);
-
-
-  console.log("config", config)
-  const grafanaUrl = config.getString('grafana.dashboardUrl');
-  console.log("grafanaUrl:", grafanaUrl);
 
   const querySaasPromotionsData = () => {
     setIsLoading(true);
@@ -315,12 +308,6 @@ export const TopologyComponent = () => {
       </InfoCard>
     );
   }
-}
-
-const getNodeColorFromState = (props: any) => {
-  if (props.deployment_state === "failed") return '#C41E3A';
-
-  return '#DCE8FA';
 }
 
 const DEFAULT_COLOR = "#DCE8FA";

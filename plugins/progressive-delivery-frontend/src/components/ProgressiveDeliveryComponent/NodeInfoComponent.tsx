@@ -63,9 +63,7 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
   const classes = useStyles();
 
   const config = useApi(configApiRef);
-  console.log("config", config)
   const grafanaUrl = config.getString('grafana.dashboardUrl');
-  console.log("grafanaUrl:", grafanaUrl);
 
   const handleCloseEvent = (event) => {
     handleClose(event.target.value)
@@ -87,6 +85,18 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
     return <Typography>Job Type: TEST</Typography>
   }
 
+  const createLogsLink = (grafanaUrl: string, appName: string, cluster: string, targetRef: string, saasFilename: string) => {
+      let identifier: string = "";
+
+      if (cluster.substring(0,5) === "hivei") identifier = "integration";
+      else if (cluster.substring(0,5) === "hives") identifier = "stage";
+
+      const env: string = `osd-${identifier}-${cluster}`;
+      const namespace: string = `${appName}-pipelines`
+
+      return `${grafanaUrl}?var-namespace=${namespace}&var-targetref=${targetRef}&var-env=${env}&var-saasfilename=${saasFilename}`;
+  }
+
   const DisplayNodeData = () => {
     return (
         <div className={classes.root}>
@@ -97,9 +107,9 @@ export const NodeInfoComponent = ({ nodeData, isPopupOpen, handleClose }: { node
           <Typography>Deployment State: {nodeData?.deployment_state}</Typography>
           <Typography>Saas: {nodeData?.saas}</Typography>
 
-          {/*<Box textAlign='center'>
-            <Button href={grafanaUrl} variant="contained" target="_blank">Logs</Button>
-          </Box>*/}
+          <Box textAlign='center'>
+            <Button href={createLogsLink(grafanaUrl, nodeData?.app, nodeData?.cluster, nodeData?.commit_sha, nodeData?.saas)} variant="contained" target="_blank">Logs</Button>
+          </Box>
         </div>
     )
   }
