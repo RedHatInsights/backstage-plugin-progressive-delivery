@@ -81,8 +81,6 @@ function simplifyManyToMany(edges: [string, string][]): [string, string][] {
 }
 
 export const TopologyComponent = () => {
-  const title: string = "Progressive Delivery Topology";
-
   const [topo, setTopo] = useState<SaasPromotionsData>({nodes: [], edges: []});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -112,6 +110,7 @@ export const TopologyComponent = () => {
         return response.text();
     }).then(data => {
         var rawData: SaasPromotionsData = JSON.parse(data);
+        console.log(rawData)
         setTopo(rawData);
         setIsLoading(false)
     }).catch((_error) => {
@@ -315,12 +314,6 @@ export const TopologyComponent = () => {
       </InfoCard>
     );
   }
-}
-
-const getNodeColorFromState = (props: any) => {
-  if (props.deployment_state === "failed") return '#C41E3A';
-
-  return '#DCE8FA';
 }
 
 const DEFAULT_COLOR = "#DCE8FA";
