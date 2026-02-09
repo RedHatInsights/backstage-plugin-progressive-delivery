@@ -48,8 +48,15 @@ backend.add(import('@backstage/plugin-search-backend-module-pg'));
 // search collators
 backend.add(import('@backstage/plugin-search-backend-module-catalog'));
 backend.add(import('@backstage/plugin-search-backend-module-techdocs'));
+backend.add(
+  import('@backstage/plugin-scaffolder-backend-module-notifications'),
+);
 
 // kubernetes
 backend.add(import('@backstage/plugin-kubernetes-backend'));
+
+// notifications and signals plugins
+backend.add(import('@backstage/plugin-notifications-backend'));
+backend.add(import('@backstage/plugin-signals-backend'));
 
 backend.start();
