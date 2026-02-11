@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState }  from 'react';
 import { DependencyGraph, DependencyGraphTypes, InfoCard } from '@backstage/core-components';
 import { useEntity } from '@backstage/plugin-catalog-react';
-import { makeStyles, StylesProvider } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { configApiRef, fetchApiRef, useApi } from '@backstage/core-plugin-api';
 import { NodeInfoComponent } from './NodeInfoComponent';
-import Tooltip from '@material-ui/core/Tooltip';
 import { Entity } from '@backstage/catalog-model';
 import Alert from '@material-ui/lab/Alert';
 
@@ -136,17 +135,22 @@ export const TopologyComponent = () => {
   const [nodes, setNodes] = useState<DependencyGraphTypes.DependencyNode[]>({});
   const [edges, setEdges] = useState<DependencyGraphTypes.DependencyEdge[]>({});
 
-  const populateNodesEdges = () => {
-    let name = entity.metadata.name.toLowerCase();
-    if (entity.spec && entity.spec.system) {
-      name = entity.spec.system.toString()
-    }
-
-    let rawEdges = topo.edges.filter(([f,t]) =>{
+  const extractRawEdges = (topo: any, name: string) => {
+    return topo.edges.filter(([f, t]) => {
       const from = JSON.parse(f);
-      const to = JSON.parse(t); 
+      const to = JSON.parse(t);
       return from.app.toLowerCase() === name.toLowerCase() || to.app.toLowerCase() === name.toLowerCase();
     });
+  }
+
+  const populateNodesEdges = () => {
+    let componentName = entity.metadata.name.toLowerCase();
+    let systemName = entity.spec?.system?.toString()
+
+    let rawEdges = systemName ? extractRawEdges(topo, systemName) : extractRawEdges(topo, componentName)
+    if (rawEdges.length == 0 && systemName) {
+      rawEdges = extractRawEdges(topo, componentName)
+    }
 
     rawEdges = simplifyManyToMany(rawEdges);
 
@@ -308,6 +312,12 @@ export const TopologyComponent = () => {
       </InfoCard>
     );
   }
+
+  return (
+    <InfoCard title="Progressive Delivery Topology">
+      <Alert severity="warning">No deployment data found for this component</Alert>
+    </InfoCard>
+  );
 }
 
 const DEFAULT_COLOR = "#DCE8FA";
