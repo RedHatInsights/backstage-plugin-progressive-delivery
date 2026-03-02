@@ -57,10 +57,7 @@ import {
   EntityKubernetesContent,
   isKubernetesAvailable,
 } from '@backstage/plugin-kubernetes';
-
-import {
-  EntityProgressiveDeliveryContent
-} from '@redhatinsights/backstage-plugin-progressive-delivery-frontend';
+import { EntityProgressiveDeliveryContent } from '@redhatinsights/backstage-plugin-progressive-delivery-frontend';
 
 const techdocsContent = (
   <EntityTechdocsContent>
@@ -153,10 +150,6 @@ const serviceEntityPage = (
       {overviewContent}
     </EntityLayout.Route>
 
-    <EntityLayout.Route path="/progressive-delivery" title="Rollout">
-      <EntityProgressiveDeliveryContent />
-    </EntityLayout.Route>
-
     <EntityLayout.Route path="/ci-cd" title="CI/CD">
       {cicdContent}
     </EntityLayout.Route>
@@ -167,6 +160,10 @@ const serviceEntityPage = (
       if={isKubernetesAvailable}
     >
       <EntityKubernetesContent />
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/progressive-delivery" title="Progressive Delivery">
+      <EntityProgressiveDeliveryContent />
     </EntityLayout.Route>
 
     <EntityLayout.Route path="/api" title="API">
@@ -213,6 +210,10 @@ const websiteEntityPage = (
       if={isKubernetesAvailable}
     >
       <EntityKubernetesContent />
+    </EntityLayout.Route>
+
+    <EntityLayout.Route path="/progressive-delivery" title="Progressive Delivery">
+      <EntityProgressiveDeliveryContent />
     </EntityLayout.Route>
 
     <EntityLayout.Route path="/dependencies" title="Dependencies">

@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "20 || 22"
+    "node": "22 || 24"
   },
   "scripts": {
-    "dev": "yarn workspaces foreach -A --include backend --include app --parallel -v -i run start",
-    "start": "yarn workspace app start",
-    "start-backend": "yarn workspace backend start",
+    "start": "backstage-cli repo start",
     "build:backend": "yarn workspace backend build",
     "build:all": "backstage-cli repo build --all",
     "build-image": "yarn workspace backend build-image",
@@ -22,7 +20,9 @@
     "lint": "backstage-cli repo lint --since origin/main",
     "lint:all": "backstage-cli repo lint",
     "prettier:check": "prettier --check .",
-    "new": "backstage-cli new"
+    "new": "backstage-cli new",
+    "export-dynamic:progressive-delivery": "yarn workspace @redhatinsights/backstage-plugin-progressive-delivery-frontend export-dynamic",
+    "mock:saas-promotions": "node dev/saas-promotions-mock/server.js"
   },
   "workspaces": {
     "packages": [
@@ -31,19 +31,16 @@
     ]
   },
   "devDependencies": {
-    "@backstage/cli": "^0.35.3",
-    "@backstage/e2e-test-utils": "^0.1.1",
+    "@backstage/cli": "^0.35.4",
+    "@backstage/e2e-test-utils": "^0.1.2",
     "@jest/environment-jsdom-abstract": "^30.0.0",
     "@playwright/test": "^1.32.3",
-    "@spotify/prettier-config": "^12.0.0",
     "@types/jest": "^30.0.0",
-    "concurrently": "^8.0.0",
     "jest": "^30.2.0",
     "jsdom": "^27.1.0",
-    "lerna": "^7.3.0",
     "node-gyp": "^10.0.0",
     "prettier": "^2.3.2",
-    "typescript": "~5.4.0"
+    "typescript": "~5.8.0"
   },
   "resolutions": {
     "@types/react": "^18",
