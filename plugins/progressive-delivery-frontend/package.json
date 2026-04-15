@@ -57,7 +57,7 @@
     "@backstage/dev-utils": "^1.1.19",
     "@backstage/test-utils": "^1.7.14",
     "@janus-idp/cli": "^3.5.0",
-    "@jest/globals": "^29.7.0",
+    "@jest/globals": "^30.3.0",
     "@patternfly/react-core": "^6.2.2",
     "@testing-library/jest-dom": "6.0.0",
     "@testing-library/react": "14.0.0",
